@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   logicmodule:
-    image: "bscdataclay/logicmodule:2.4.jdk8.dev"
+    image: "bscdataclay/logicmodule:2.4.dev"
     command: "${COMMAND_OPTS}"
     ports:
       - "11034:11034"
@@ -10,7 +10,6 @@ services:
       - LOGICMODULE_HOST=logicmodule
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
-      #- EXPOSED_IP_FOR_CLIENT=192.168.7.32
     volumes:
       - ./prop/global.properties:/home/dataclayusr/dataclay/cfgfiles/global.properties:ro
       - ./prop/log4j2.xml:/home/dataclayusr/dataclay/logging/log4j2.xml:ro
@@ -21,7 +20,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
          
   dsjava:
-    image: "bscdataclay/dsjava:2.4.jdk8.dev"
+    image: "bscdataclay/dsjava:2.4.dev"
     command: "${COMMAND_OPTS}"
     ports:
       - "2127:2127"
@@ -42,7 +41,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
        
   dspython:
-    image: "bscdataclay/dspython:2.4.py37.dev"
+    image: "bscdataclay/dspython:2.4.dev"
     command: "${COMMAND_OPTS}"
     ports:
       - "6867:6867"
