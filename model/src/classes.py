@@ -34,7 +34,7 @@ class DKB(DataClayObject):
     @dclayMethod(return_='anything')
     def getVehicles(self):
         result = set() 
-        for eventSnp in KB: 
+        for eventSnp in self.KB: 
            for objInSnapshot in eventSnp.objectsRefs:
               if objInSnapshot.type != "Pedestrian":  
                   result.add(objInSnapshot)
