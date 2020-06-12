@@ -1,0 +1,2 @@
+FROM bscdataclay/dsjava:2.4.dev
+ENTRYPOINT ["dataclay-java-entry-point", "es.bsc.dataclay.dataservice.server.DataServiceSrv","--service"] 
