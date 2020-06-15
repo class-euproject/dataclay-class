@@ -1,6 +1,6 @@
 from dataclay import DataClayObject, dclayMethod
 """
-City Knoledge Base: collection of Events Events Snapshots
+City Knowledge Base: collection of Events Snapshots
 """
 class DKB(DataClayObject):
     """
@@ -27,15 +27,6 @@ class DKB(DataClayObject):
     def removeEventsSnapshot(self, eventSnp): 
         pass
 
-    #@dclayMethod(return_='anything')
-    #def getVehicles(self):
-    #    result = set() 
-    #    for eventSnp in self.KB: 
-    #       for objInSnapshot in eventSnp.objectsRefs:
-    #          if objInSnapshot.type != "Pedestrian":  
-    #              result.add(objInSnapshot)
-    #    return result
-
 """
 Events Snapshots: List of the objects detected in an snapshot. Each object
 contains a list of events (last event for current snapshot and events history).
@@ -43,28 +34,20 @@ contains a list of events (last event for current snapshot and events history).
 class EventsSnapshot(DataClayObject):
     """
     @ClassField objectsRefs list<str>
-    @ClassField objects list<CityNS.classes.Object>
     """
 
     @dclayMethod()
     def __init__(self):
         self.objectsRefs = []
-        self.objects = []
 
-    @dclayMethod(new_object="CityNS.classes.Object", object_alias="str")
-    def add_object(self, new_object, object_alias):
-        self.objects.append(new_object)
+    @dclayMethod(object_alias="str")
+    def add_object_refs(self, object_alias):
         self.objectsRefs.append(object_alias)
 
     # Returns the list of Object refs
     @dclayMethod(return_='list<str>')
     def get_objects_refs(self):
         return self.objectsRefs
-
-    # Returns the list of Objects
-    @dclayMethod(return_='list<CityNS.classes.Object>')
-    def get_objects(self):
-        return self.objects
 
     @dclayMethod() 
     def when_federated(self):
@@ -109,16 +92,20 @@ class Object(DataClayObject):
         self.speed = speed
         self.yaw = yaw
         self.eventsHistory = []
-        self.trajectoryP = None
+        self.trajectoryP_x = []
+        self.trajectoryP_y = []
+        self.trajectoryP_t = []
 
     @dclayMethod(event='CityNS.classes.Event')
     def add_event(self, event):
         self.eventsHistory.append(event)
 
     # Updates the trajectory prediction
-    @dclayMethod(tp='str')
-    def add_prediction(self, tp):
-        self.trajectoryP = tp
+    @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>')
+    def add_prediction(self, tpx, tpy, tpt):
+        self.trajectoryP_x = tpx
+        self.trajectoryP_y = tpy
+        self.trajectoryP_t = tpt
     
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(return_="anything")
@@ -132,10 +119,6 @@ class Object(DataClayObject):
             dqx.append(event.longitudePos)
             dqy.append(event.latitudePos)
             dqt.append(event.timestamp)
-            #if len(dqx) > QUAD_REG_LEN:
-            #    dqx.popleft()
-            #    dqy.popleft()
-            #    dqt.popleft()
         return dqx, dqy, dqt 
 
     @dclayMethod(return_='str')
