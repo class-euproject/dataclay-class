@@ -4,27 +4,27 @@ City Knowledge Base: collection of Events Snapshots
 """
 class DKB(DataClayObject):
     """
-    @ClassField KB list<CityNS.classes.EventsSnapshot>
+    @ClassField kb list<CityNS.classes.EventsSnapshot>
     """
     @dclayMethod()
     def __init__(self):
-        self.KB = []
+        self.kb = []
 
     @dclayMethod(eventsSt='list<CityNS.classes.EventsSnapshot>')
-    def aggregatteEvents(self, eventsSt):
-        for event in eventsSt:
-            self.aggregatte(event)
+    def aggregate_events(self, events_st):
+        for event in events_st:
+            self.add_events_snapshot(event)
 
     @dclayMethod()
-    def resetDKB(self):
-        self.KB = []
+    def reset_dkb(self):
+        self.kb = []
+
+    @dclayMethod(event_snp='CityNS.classes.EventsSnapshot')
+    def add_events_snapshot(self, event_snp): 
+        self.kb.append(event_snp)
 
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
-    def addEventsSnapshot(self, eventSnp): 
-        self.KB.append(eventSnp)
-
-    @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
-    def removeEventsSnapshot(self, eventSnp): 
+    def remove_events_snapshot(self, event_snp): 
         pass
 
 """
@@ -33,40 +33,40 @@ contains a list of events (last event for current snapshot and events history).
 """
 class EventsSnapshot(DataClayObject):
     """
-    @ClassField objectsRefs list<str>
+    @ClassField objects_refs list<str>
     """
 
     @dclayMethod()
     def __init__(self):
-        self.objectsRefs = []
+        self.objects_refs = []
 
     @dclayMethod(object_alias="str")
     def add_object_refs(self, object_alias):
-        self.objectsRefs.append(object_alias)
+        self.objects_refs.append(object_alias)
 
     # Returns the list of Object refs
     @dclayMethod(return_='list<str>')
     def get_objects_refs(self):
-        return self.objectsRefs
+        return self.objects_refs
 
     @dclayMethod() 
     def when_federated(self):
         print("Calling when federated in EventsSnapshot")
         kb = DKB.get_by_alias("DKB");
-        kb.addEventsSnapshot(self);
+        kb.add_events_snapshot(self);
         # TODO: require prediction via REST
-        # for objectRef in self.objectsRefs: 
+        # for object_ref in self.objects_refs: 
              # call prediction with str
              
     @dclayMethod()
     def when_unfederated(self):
         print("Calling when unfederated in EventsSnapshot")
         kb = DKB.get_by_alias("DKB");
-        kb.removeEventsSnapshot(self);
+        kb.remove_events_snapshot(self);
 
     @dclayMethod()
     def delete(self):
-        self.objectsRefs = list()
+        self.objects_refs = list()
 
 """
 Object: Vehicle or Pedestrian detected
@@ -75,73 +75,73 @@ Object: Vehicle or Pedestrian detected
 """
 class Object(DataClayObject):
     """
-    @ClassField idObject int
+    @ClassField id_object int
     @ClassField type str
     @ClassField speed float
     @ClassField yaw float
-    @ClassField eventsHistory list<CityNS.classes.Event>
-    @ClassField trajectoryP_x list<float>
-    @ClassField trajectoryP_y list<float>
-    @ClassField trajectoryP_t list<anything>
+    @ClassField events_history list<CityNS.classes.Event>
+    @ClassField trajectory_px list<float>
+    @ClassField trajectory_py list<float>
+    @ClassField trajectory_pt list<anything>
     """
     
-    @dclayMethod(idObject='int', objType='str', speed='float', yaw='float')
-    def __init__(self, idObject, objType, speed, yaw):
-        self.idObject = idObject
-        self.type = objType
+    @dclayMethod(id_object='int', obj_type='str', speed='float', yaw='float')
+    def __init__(self, id_object, obj_type, speed, yaw):
+        self.id_object = id_object
+        self.type = obj_type
         self.speed = speed
         self.yaw = yaw
-        self.eventsHistory = []
-        self.trajectoryP_x = []
-        self.trajectoryP_y = []
-        self.trajectoryP_t = []
+        self.events_history = []
+        self.trajectory_px = []
+        self.trajectory_py = []
+        self.trajectory_pt = []
 
     @dclayMethod(event='CityNS.classes.Event')
     def add_event(self, event):
-        self.eventsHistory.append(event)
+        self.events_history.append(event)
 
     # Updates the trajectory prediction
     @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>')
     def add_prediction(self, tpx, tpy, tpt):
-        self.trajectoryP_x = tpx
-        self.trajectoryP_y = tpy
-        self.trajectoryP_t = tpt
+        self.trajectory_px = tpx
+        self.trajectory_py = tpy
+        self.trajectory_pt = tpt
     
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(return_="anything")
-    def getEventsHistory(self):
+    def get_events_history(self):
         from collections import deque
         # Events in following format(dqx, dqy, dqt)
         dqx = deque()
         dqy = deque()
         dqt = deque()
-        for event in self.eventsHistory:
-            dqx.append(event.longitudePos)
-            dqy.append(event.latitudePos)
+        for event in self.events_history:
+            dqx.append(event.longitude_pos)
+            dqy.append(event.latitude_pos)
             dqt.append(event.timestamp)
         return dqx, dqy, dqt 
 
     @dclayMethod(return_='str')
     def __str__(self):
-        return "Object %s of type %s with Events %s" % (str(self.idObject), str(self.type), str(self.eventsHistory))
+        return "Object %s of type %s with Events %s" % (str(self.id_object), str(self.type), str(self.events_history))
 
 """
 Event: Instantiation of an Object for a given position and time.
 """
 class Event(DataClayObject):
     """
-    @ClassField idEvent int
+    @ClassField id_event int
     @ClassField timestamp anything
-    @ClassField longitudePos float
-    @ClassField latitudePos float
+    @ClassField longitude_pos float
+    @ClassField latitude_pos float
     """
-    @dclayMethod(idEvent='int', timestamp='anything', longitudePos='float', latitudePos='float')
-    def __init__(self, idEvent, timestamp, longitudePos, latitudePos):
-        self.idEvent = idEvent
+    @dclayMethod(id_event='int', timestamp='anything', longitude_pos='float', latitude_pos='float')
+    def __init__(self, id_event, timestamp, longitude_pos, latitude_pos):
+        self.id_event = id_event
         self.timestamp = timestamp
-        self.longitudePos = longitudePos
-        self.latitudePos = latitudePos
+        self.longitude_pos = longitude_pos
+        self.latitude_pos = latitude_pos
 
     @dclayMethod(return_='str')
     def __str__(self):
-        return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitudePos),str(self.latitudePos),str(self.timestamp),str(self.idEvent))
+        return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitude_pos),str(self.latitude_pos),str(self.timestamp),str(self.id_event))
