@@ -43,20 +43,28 @@ contains a list of events (last event for current snapshot and events history).
 class EventsSnapshot(DataClayObject):
     """
     @ClassField objectsRefs list<str>
+    @ClassField objects list<CityNS.classes.Object>
     """
 
     @dclayMethod()
     def __init__(self):
         self.objectsRefs = []
+        self.objects = []
 
-    @dclayMethod(new_object="str")
-    def add_object_ref(self, new_object):
-        self.objectsRefs.append(new_object)
+    @dclayMethod(new_object="CityNS.classes.Object", object_alias="str")
+    def add_object(self, new_object, object_alias):
+        self.objects.append(new_object)
+        self.objectsRefs.append(object_alias)
 
     # Returns the list of Object refs
     @dclayMethod(return_='list<str>')
-    def getObjectsRefs(self):
+    def get_objects_refs(self):
         return self.objectsRefs
+
+    # Returns the list of Objects
+    @dclayMethod(return_='list<CityNS.classes.Object>')
+    def get_objects(self):
+        return self.objects
 
     @dclayMethod() 
     def when_federated(self):
