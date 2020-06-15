@@ -10,10 +10,6 @@ class DKB(DataClayObject):
     def __init__(self):
         self.KB = []
 
-    @dclayMethod(eventSt='CityNS.classes.EventsSnapshot')
-    def aggregatte(self, eventSt):
-        self.KB.append(eventSt)
-
     @dclayMethod(eventsSt='list<CityNS.classes.EventsSnapshot>')
     def aggregatteEvents(self, eventsSt):
         for event in eventsSt:
@@ -31,14 +27,14 @@ class DKB(DataClayObject):
     def removeEventsSnapshot(self, eventSnp): 
         pass
 
-    @dclayMethod(return_='anything')
-    def getVehicles(self):
-        result = set() 
-        for eventSnp in self.KB: 
-           for objInSnapshot in eventSnp.objectsRefs:
-              if objInSnapshot.type != "Pedestrian":  
-                  result.add(objInSnapshot)
-        return result
+    #@dclayMethod(return_='anything')
+    #def getVehicles(self):
+    #    result = set() 
+    #    for eventSnp in self.KB: 
+    #       for objInSnapshot in eventSnp.objectsRefs:
+    #          if objInSnapshot.type != "Pedestrian":  
+    #              result.add(objInSnapshot)
+    #    return result
 
 """
 Events Snapshots: List of the objects detected in an snapshot. Each object
@@ -93,7 +89,9 @@ class Object(DataClayObject):
     @ClassField speed float
     @ClassField yaw float
     @ClassField eventsHistory list<CityNS.classes.Event>
-    @ClassField trajectoryP str
+    @ClassField trajectoryP_x list<float>
+    @ClassField trajectoryP_y list<float>
+    @ClassField trajectoryP_t list<anything>
     """
     
     @dclayMethod(idObject='int', objType='str', speed='float', yaw='float')
@@ -116,12 +114,21 @@ class Object(DataClayObject):
     
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(return_="anything")
-    def getObjectAndEventsHistory(self):
+    def getEventsHistory(self):
+        from collections import deque
         # Events in following format(dqx, dqy, dqt)
-        result = list()
-        for event in self.eventsHistory: 
-            result.append((event.longitudePos,event.latitudePos, event.timestamp))
-        return result
+        dqx = deque()
+        dqy = deque()
+        dqt = deque()
+        for event in self.eventsHistory:
+            dqx.append(event.longitudePos)
+            dqy.append(event.latitudePos)
+            dqt.append(event.timestamp)
+            #if len(dqx) > QUAD_REG_LEN:
+            #    dqx.popleft()
+            #    dqy.popleft()
+            #    dqt.popleft()
+        return dqx, dqy, dqt 
 
     @dclayMethod(return_='str')
     def __str__(self):
