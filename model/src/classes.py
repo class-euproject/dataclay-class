@@ -23,6 +23,19 @@ class DKB(DataClayObject):
     def add_events_snapshot(self, event_snp): 
         self.kb.append(event_snp)
 
+    @dclayMethod(return_="list<anything>")
+    def get_objects_from_dkb(self):
+        objs = []
+        obj_refs = []
+        for event_snap in reversed(self.kb): # get latest updates for objects
+            for obj_ref in event_snap:
+                if obj_ref not in obj_refs:
+                    obj_refs.append(obj_ref)
+                    obj = Object.get_by_alias(obj_ref)
+                    objs.append((obj.id_object, obj.trajectory_px, obj.trajectory_py, obj.trajectory_pt))
+        return objs
+
+
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
     def remove_events_snapshot(self, event_snp): 
         pass
@@ -52,17 +65,15 @@ class EventsSnapshot(DataClayObject):
     @dclayMethod() 
     def when_federated(self):
         print("Calling when federated in EventsSnapshot")
-        kb = DKB.get_by_alias("DKB");
-        kb.add_events_snapshot(self);
-        # TODO: require prediction via REST
-        # for object_ref in self.objects_refs: 
-             # call prediction with str
+        kb = DKB.get_by_alias("DKB")
+        kb.add_events_snapshot(self)
+        # TODO: trigger prediction via REST with alias specified for last EventsSnapshot
              
     @dclayMethod()
     def when_unfederated(self):
         print("Calling when unfederated in EventsSnapshot")
-        kb = DKB.get_by_alias("DKB");
-        kb.remove_events_snapshot(self);
+        kb = DKB.get_by_alias("DKB")
+        kb.remove_events_snapshot(self)
 
     @dclayMethod()
     def delete(self):
