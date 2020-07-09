@@ -28,7 +28,7 @@ class DKB(DataClayObject):
         objs = []
         obj_refs = []
         for event_snap in reversed(self.kb): # get latest updates for objects
-            for obj_ref in event_snap:
+            for obj_ref in event_snap.objects_refs:
                 if obj_ref not in obj_refs:
                     obj_refs.append(obj_ref)
                     obj = Object.get_by_alias(obj_ref)
