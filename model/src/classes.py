@@ -47,11 +47,13 @@ contains a list of events (last event for current snapshot and events history).
 class EventsSnapshot(DataClayObject):
     """
     @ClassField objects_refs list<str>
+    @ClassField snap_alias str
     """
 
-    @dclayMethod()
-    def __init__(self):
+    @dclayMethod(alias='str')
+    def __init__(self, alias):
         self.objects_refs = []
+        self.snap_alias = alias
 
     @dclayMethod(object_alias="str")
     def add_object_refs(self, object_alias):
@@ -64,10 +66,20 @@ class EventsSnapshot(DataClayObject):
 
     @dclayMethod() 
     def when_federated(self):
+        import requests
         print("Calling when federated in EventsSnapshot")
         kb = DKB.get_by_alias("DKB")
         kb.add_events_snapshot(self)
         # TODO: trigger prediction via REST with alias specified for last EventsSnapshot
+        APIHOST = 'https://192.168.7.40:31001'
+        AUTH_KEY = '23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP'
+        NAMESPACE = '_'
+        BLOCKING = 'true'
+        RESULT = 'true'
+        TRIGGER = 'tp-trigger'
+        url = APIHOST + '/api/v1/namespaces/' + NAMESPACE + '/triggers/' + TRIGGER
+        user_pass = AUTH_KEY.split(':')
+        response = requests.post(url, params={'blocking':BLOCKING, 'result':RESULT, 'ALIAS':"GEIC"}, auth=(user_pass[0], user_pass[1]), verify=False)
              
     @dclayMethod()
     def when_unfederated(self):
