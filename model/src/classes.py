@@ -79,7 +79,8 @@ class EventsSnapshot(DataClayObject):
         TRIGGER = 'tp-trigger'
         url = APIHOST + '/api/v1/namespaces/' + NAMESPACE + '/triggers/' + TRIGGER
         user_pass = AUTH_KEY.split(':')
-        response = requests.post(url, params={'blocking':BLOCKING, 'result':RESULT, 'ALIAS':"GEIC"}, auth=(user_pass[0], user_pass[1]), verify=False)
+        alias = self.snap_alias
+        response = requests.post(url, params={'blocking':BLOCKING, 'result':RESULT, 'ALIAS':str(alias)}, auth=(user_pass[0], user_pass[1]), verify=False)
              
     @dclayMethod()
     def when_unfederated(self):
