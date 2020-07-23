@@ -1,0 +1,45 @@
+# dataClay header
+# This is a Stub, to be used for the user client
+from dataclay import dclayMethod, DataClayObject
+
+# Imports required by the following class
+
+# Definition of dataClay object class: DKB
+class DKB(DataClayObject):
+
+    @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
+    def remove_events_snapshot(self, event_snp): 
+        pass
+    @dclayMethod(return_="list<anything>")
+    def get_objects_from_dkb(self):
+        objs = []
+        obj_refs = []
+        for event_snap in reversed(self.kb): # get latest updates for objects
+            for obj_ref in event_snap.objects_refs:
+                if obj_ref not in obj_refs:
+                    obj_refs.append(obj_ref)
+                    obj = Object.get_by_alias(obj_ref)
+                    objs.append((obj.id_object, obj.trajectory_px, obj.trajectory_py, obj.trajectory_pt))
+        return objs
+    @dclayMethod()
+    def reset_dkb(self):
+        self.kb = []
+    @dclayMethod(eventsSt='list<CityNS.classes.EventsSnapshot>')
+    def aggregate_events(self, events_st):
+        for event in events_st:
+            self.add_events_snapshot(event)
+    @dclayMethod()
+    def __init__(self):
+        self.kb = []
+    @dclayMethod(obj='anything', property_name='str', value='anything', beforeUpdate='str', afterUpdate='str')
+    def __setUpdate__(self, obj, property_name, value, beforeUpdate, afterUpdate):
+        if beforeUpdate is not None:
+            getattr(self, beforeUpdate)(property_name, value)
+        object.__setattr__(obj, "%s%s" % ("_dataclay_property_", property_name), value)
+        if afterUpdate is not None:
+            getattr(self, afterUpdate)(property_name, value)
+    @dclayMethod(event_snp='CityNS.classes.EventsSnapshot')
+    def add_events_snapshot(self, event_snp): 
+        self.kb.append(event_snp)
+    pass
+# End of class definition

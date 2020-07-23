@@ -1,0 +1,27 @@
+# dataClay header
+# This is a Stub, to be used for the user client
+from dataclay import dclayMethod, DataClayObject
+
+# Imports required by the following class
+
+# Definition of dataClay object class: Event
+class Event(DataClayObject):
+
+    @dclayMethod(id_event='int', timestamp='anything', longitude_pos='float', latitude_pos='float')
+    def __init__(self, id_event, timestamp, longitude_pos, latitude_pos):
+        self.id_event = id_event
+        self.timestamp = timestamp
+        self.longitude_pos = longitude_pos
+        self.latitude_pos = latitude_pos
+    @dclayMethod(obj='anything', property_name='str', value='anything', beforeUpdate='str', afterUpdate='str')
+    def __setUpdate__(self, obj, property_name, value, beforeUpdate, afterUpdate):
+        if beforeUpdate is not None:
+            getattr(self, beforeUpdate)(property_name, value)
+        object.__setattr__(obj, "%s%s" % ("_dataclay_property_", property_name), value)
+        if afterUpdate is not None:
+            getattr(self, afterUpdate)(property_name, value)
+    @dclayMethod(return_='str')
+    def __str__(self):
+        return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitude_pos),str(self.latitude_pos),str(self.timestamp),str(self.id_event))
+    pass
+# End of class definition

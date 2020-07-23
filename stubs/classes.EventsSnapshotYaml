@@ -1,0 +1,351 @@
+!!es.bsc.dataclay.util.management.stubs.StubInfo
+applicantID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+classID: !!es.bsc.dataclay.util.ids.MetaClassID '7bb1111a-8b35-4414-aa82-ca930ca31287'
+className: classes.EventsSnapshot
+contracts: !!set {!!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf': null}
+implementations:
+  $$getsnap_alias: &id001 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '926a653b-37b9-43b4-9aa2-9fee3f721581'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID '1de1c273-254b-489c-a1f4-92aed0e59716'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '926a653b-37b9-43b4-9aa2-9fee3f721581'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '6ce9a0a1-2419-4f9a-9d5e-875d5c4951fa'
+      includes: []
+      languageDepInfos: {}
+      signature: python.str
+      typeName: null
+    signature: $$getsnap_alias
+  when_unfederated: &id011 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '52e8f814-c5e8-4043-be5a-3d395566cc6a'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID '02249bae-733c-4087-8b6f-075f6f6bb2df'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '52e8f814-c5e8-4043-be5a-3d395566cc6a'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID 'efbfa2fa-3d82-4d5f-9515-460df9b85896'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: when_unfederated
+  get_objects_refs: &id004 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'c37304be-25fa-425f-95f0-024dfd60b362'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'c048b697-0df7-424b-bbbe-41ef4c5a6e7e'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'c37304be-25fa-425f-95f0-024dfd60b362'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID 'd3ef1768-0535-43bd-a73b-4399e8c8c125'
+      includes: []
+      languageDepInfos: {}
+      signature: python.list[str]
+      typeName: null
+    signature: get_objects_refs
+  when_federated: &id003 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '17a683a0-d149-458c-be30-19eef2694dd4'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID '6dc1a160-915a-460d-9aa7-c1349aa8923c'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '17a683a0-d149-458c-be30-19eef2694dd4'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID 'd426bb9b-0937-44b9-81ab-b22685527821'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: when_federated
+  $$setsnap_alias: &id006 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '4d759cf1-296f-4009-be38-1e69496ae14e'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID '16a455d6-41e0-493d-af02-f8c9353075f2'
+    params:
+      param0: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '229a1024-e5de-49f2-802d-5447df4a9f9e'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+    paramsOrder: [param0]
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '4d759cf1-296f-4009-be38-1e69496ae14e'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: V
+      id: !!java.util.UUID 'c630b3a0-5fb7-4629-bc64-39748fca02a5'
+      includes: []
+      languageDepInfos: {}
+      signature: null
+      typeName: void
+    signature: $$setsnap_alias
+  __setUpdate__: &id009 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '2a9495e8-41fd-4dd5-8cfd-e038c8b4ab10'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'e784d49c-0846-4cd7-ba8d-d991777b4541'
+    params:
+      beforeUpdate: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '9d497ea8-c8c8-4533-ac41-909edb234e6d'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+      obj: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '608aa079-6bba-4b92-aca9-ddec16a8613e'
+        includes: []
+        languageDepInfos: {}
+        signature: anything
+        typeName: null
+      afterUpdate: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '57e0258a-65c7-4324-8aa4-d7d641e4d853'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+      value: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '3f763a14-7631-46bb-af5c-4692550eb82f'
+        includes: []
+        languageDepInfos: {}
+        signature: anything
+        typeName: null
+      property_name: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '3038d2a2-adf9-4f42-b2ee-481e56c9c0e2'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+    paramsOrder: [obj, property_name, value, beforeUpdate, afterUpdate]
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '2a9495e8-41fd-4dd5-8cfd-e038c8b4ab10'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '60056bce-26fb-4621-b96c-4b9cca89582a'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: __setUpdate__
+  $$setobjects_refs: &id005 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '6edb9198-8a8b-4042-83b3-cd45fffce7e6'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'c260a79e-6d26-4c6c-a181-ae4412fa430e'
+    params:
+      param0: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '381246fd-eed6-4100-97e3-8a406a100760'
+        includes: []
+        languageDepInfos: {}
+        signature: python.list[str]
+        typeName: null
+    paramsOrder: [param0]
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '6edb9198-8a8b-4042-83b3-cd45fffce7e6'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: V
+      id: !!java.util.UUID '1745f022-19e8-462a-80c4-e8adc181e5db'
+      includes: []
+      languageDepInfos: {}
+      signature: null
+      typeName: void
+    signature: $$setobjects_refs
+  __init__: &id008 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'e6a4346f-7b18-47bc-9c77-7e802833f2ac'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'd3a768bb-3502-446b-afa3-9ab00e882963'
+    params:
+      alias: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '52fa6a6c-55ee-428a-9fc6-645487b03e34'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+    paramsOrder: [alias]
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'e6a4346f-7b18-47bc-9c77-7e802833f2ac'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID 'ac5c216c-8abf-4700-9f61-1343caf109d1'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: __init__
+  add_object_refs: &id010 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'a573b3a1-2027-4a28-838a-e1d19724563f'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'e253d3a2-8b58-4105-956c-b3bb342376f2'
+    params:
+      object_alias: !!es.bsc.dataclay.util.management.classmgr.Type
+        descriptor: null
+        id: !!java.util.UUID '39deb8f0-b719-4a7f-aadf-ae6527b81742'
+        includes: []
+        languageDepInfos: {}
+        signature: python.str
+        typeName: null
+    paramsOrder: [object_alias]
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID 'a573b3a1-2027-4a28-838a-e1d19724563f'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '01aa6791-a5a6-423a-9325-216c3b13f631'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: add_object_refs
+  delete: &id007 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '09f0f66e-6b29-411f-b878-8f1e1033232b'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID 'f2877e1b-10e2-4059-b478-513facb58949'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '09f0f66e-6b29-411f-b878-8f1e1033232b'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID 'e0815d48-4045-4f70-9614-7fc56d553d9d'
+      includes: []
+      languageDepInfos: {}
+      signature: V
+      typeName: null
+    signature: delete
+  $$getobjects_refs: &id002 !!es.bsc.dataclay.util.management.stubs.ImplementationStubInfo
+    className: classes.EventsSnapshot
+    contractID: !!es.bsc.dataclay.util.ids.ContractID '0647710b-4c3b-47e8-8fcd-f3f438b3facf'
+    implPosition: 0
+    interfaceID: !!es.bsc.dataclay.util.ids.InterfaceID 'ff24c64c-564f-478a-875d-d1059046027f'
+    localImplID: !!es.bsc.dataclay.util.ids.ImplementationID '08f9199e-5ec8-450a-852c-3ad6e0e43fd2'
+    namespace: CityNS
+    namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+    operationID: !!es.bsc.dataclay.util.ids.OperationID '6645a0eb-4bf6-4940-a58c-90c5e894aed2'
+    params: {}
+    paramsOrder: []
+    remoteImplID: !!es.bsc.dataclay.util.ids.ImplementationID '08f9199e-5ec8-450a-852c-3ad6e0e43fd2'
+    responsibleRemoteAccountID: !!es.bsc.dataclay.util.ids.AccountID 'beeb930f-63f7-4faf-884b-30cc4f3f40e6'
+    returnType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '1939ad22-89cd-4300-9747-2461f4acf97a'
+      includes: []
+      languageDepInfos: {}
+      signature: python.list[str]
+      typeName: null
+    signature: $$getobjects_refs
+implementationsByID:
+  926a653b-37b9-43b4-9aa2-9fee3f721581: *id001
+  08f9199e-5ec8-450a-852c-3ad6e0e43fd2: *id002
+  17a683a0-d149-458c-be30-19eef2694dd4: *id003
+  c37304be-25fa-425f-95f0-024dfd60b362: *id004
+  6edb9198-8a8b-4042-83b3-cd45fffce7e6: *id005
+  4d759cf1-296f-4009-be38-1e69496ae14e: *id006
+  09f0f66e-6b29-411f-b878-8f1e1033232b: *id007
+  e6a4346f-7b18-47bc-9c77-7e802833f2ac: *id008
+  2a9495e8-41fd-4dd5-8cfd-e038c8b4ab10: *id009
+  a573b3a1-2027-4a28-838a-e1d19724563f: *id010
+  52e8f814-c5e8-4043-be5a-3d395566cc6a: *id011
+namespace: CityNS
+namespaceID: !!es.bsc.dataclay.util.ids.NamespaceID 'cd56ef1e-6a04-40da-a5f4-804ab7c804bb'
+parentClassName: null
+properties:
+  objects_refs: !!es.bsc.dataclay.util.management.stubs.PropertyStubInfo
+    afterUpdate: null
+    beforeUpdate: null
+    getterOperationID: !!es.bsc.dataclay.util.ids.OperationID '6645a0eb-4bf6-4940-a58c-90c5e894aed2'
+    inMaster: false
+    namespace: CityNS
+    namespaceID: null
+    propertyID: !!es.bsc.dataclay.util.ids.PropertyID '9a0109a7-fd73-4969-9293-833d64ee1eb2'
+    propertyName: objects_refs
+    propertyType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '4083fd58-15a7-4804-94e5-58a6ddb9b016'
+      includes: []
+      languageDepInfos: {}
+      signature: python.list[str]
+      typeName: null
+    setterOperationID: !!es.bsc.dataclay.util.ids.OperationID 'c260a79e-6d26-4c6c-a181-ae4412fa430e'
+  snap_alias: !!es.bsc.dataclay.util.management.stubs.PropertyStubInfo
+    afterUpdate: null
+    beforeUpdate: null
+    getterOperationID: !!es.bsc.dataclay.util.ids.OperationID '1de1c273-254b-489c-a1f4-92aed0e59716'
+    inMaster: false
+    namespace: CityNS
+    namespaceID: null
+    propertyID: !!es.bsc.dataclay.util.ids.PropertyID 'e24fc9ff-f047-4951-a2f0-c129788aa119'
+    propertyName: snap_alias
+    propertyType: !!es.bsc.dataclay.util.management.classmgr.Type
+      descriptor: null
+      id: !!java.util.UUID '7803747e-a9e3-4444-bbfd-419283a65666'
+      includes: []
+      languageDepInfos: {}
+      signature: python.str
+      typeName: null
+    setterOperationID: !!es.bsc.dataclay.util.ids.OperationID '16a455d6-41e0-493d-af02-f8c9353075f2'
+propertyListWithNulls: [objects_refs, snap_alias]
