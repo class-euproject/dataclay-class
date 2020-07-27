@@ -353,7 +353,7 @@ class EventsSnapshot(DataClayObject):
         url = APIHOST + '/api/v1/namespaces/' + NAMESPACE + '/triggers/' + TRIGGER
         user_pass = AUTH_KEY.split(':')
         alias = self.snap_alias
-        response = requests.post(url, params={'blocking':BLOCKING, 'result':RESULT, 'ALIAS':str(alias)}, auth=(user_pass[0], user_pass[1]), verify=False)
+        response = requests.post(url, params={'blocking':BLOCKING, 'result':RESULT}, json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]), verify=False)
     @dclayMethod(obj='anything', property_name='str', value='anything', beforeUpdate='str', afterUpdate='str')
     def __setUpdate__(self, obj, property_name, value, beforeUpdate, afterUpdate):
         if beforeUpdate is not None:
