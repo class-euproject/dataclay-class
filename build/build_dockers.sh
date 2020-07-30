@@ -41,6 +41,7 @@ done
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 DOCKER_BUILDER=$(docker buildx create)
 PLATFORMS=linux/amd64,linux/arm64
+#PLATFORMS=linux/arm64
 docker buildx use $DOCKER_BUILDER
 docker buildx build -f Dockerfile.LM -t bscppc/dataclay-logicmodule \
         --platform $PLATFORMS \
