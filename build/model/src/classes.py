@@ -155,13 +155,15 @@ Event: Instantiation of an Object for a given position and time.
 class Event(DataClayObject):
     """
     @ClassField id_event int
+    @ClassField detected_object CityNS.classes.Object
     @ClassField timestamp anything
     @ClassField longitude_pos float
     @ClassField latitude_pos float
     """
-    @dclayMethod(id_event='int', timestamp='anything', longitude_pos='float', latitude_pos='float')
-    def __init__(self, id_event, timestamp, longitude_pos, latitude_pos):
+    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='float', latitude_pos='float')
+    def __init__(self, id_event, detected_object, timestamp, longitude_pos, latitude_pos):
         self.id_event = id_event
+        self.detected_object = detected_object
         self.timestamp = timestamp
         self.longitude_pos = longitude_pos
         self.latitude_pos = latitude_pos
@@ -169,3 +171,7 @@ class Event(DataClayObject):
     @dclayMethod(return_='str')
     def __str__(self):
         return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitude_pos),str(self.latitude_pos),str(self.timestamp),str(self.id_event))
+
+    @dclayMethod()
+    def when_federated(self):
+        self.detected_object.add_event(self)
