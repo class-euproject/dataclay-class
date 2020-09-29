@@ -139,11 +139,13 @@ class Object(DataClayObject):
         dqx = deque()
         dqy = deque()
         dqt = deque()
+        dqh = deque()
         for event in self.events_history:
             dqx.append(event.longitude_pos)
             dqy.append(event.latitude_pos)
             dqt.append(event.timestamp)
-        return dqx, dqy, dqt 
+            dqh.append(event.geohash)
+        return dqx, dqy, dqt, dqh
 
     @dclayMethod(return_='str')
     def __str__(self):
@@ -159,18 +161,20 @@ class Event(DataClayObject):
     @ClassField timestamp anything
     @ClassField longitude_pos float
     @ClassField latitude_pos float
+    @ClassField geohash str
     """
-    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='float', latitude_pos='float')
-    def __init__(self, id_event, detected_object, timestamp, longitude_pos, latitude_pos):
+    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='float', latitude_pos='float', geohash='str')
+    def __init__(self, id_event, detected_object, timestamp, longitude_pos, latitude_pos, geohash):
         self.id_event = id_event
         self.detected_object = detected_object
         self.timestamp = timestamp
         self.longitude_pos = longitude_pos
         self.latitude_pos = latitude_pos
+        self.geohash = geohash
 
     @dclayMethod(return_='str')
     def __str__(self):
-        return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitude_pos),str(self.latitude_pos),str(self.timestamp),str(self.id_event))
+        return "(long=%s,lat=%s,geohash=%s,time=%s,id=%s)" % (str(self.longitude_pos),str(self.latitude_pos),str(self.geohash),str(self.timestamp),str(self.id_event))
 
     @dclayMethod()
     def when_federated(self):
