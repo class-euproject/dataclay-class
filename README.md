@@ -9,7 +9,7 @@ To build the dockers containing the data model defined below, use the script loc
 
 ## Model 
 
-<p align="center"><img src="./imgs/class_DC_model_MS3.png" alt="DataClay Model" title="DataClay Model"/></p>
+<p align="center"><img src="./imgs/class-dataclay-model.png" alt="DataClay Model" title="DataClay Model"/></p>
 
 
 # Deployment
