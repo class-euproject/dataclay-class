@@ -16,8 +16,9 @@ class DKB(DataClayObject):
     def __init__(self, k=10):
         self.kb = []
         self.K = k
-        self.connectedCars = [31, 32, 41] # TODO: add tuple elements (int, str) in which first := obj_type and second := IP@
-        self.smartCars = [] # TODO: add tuple elements (int, str) in which first := obj_type and second := IP@
+        self.connectedCars = [31, 32, 41] # TODO: change as below. Also replace definition from list<anything>
+        # dict<anything>: self.connectedCars = {31: 'X.X.X.X', 32: 'Y.Y.Y.Y'} # TODO: as dictionaries
+        self.smartCars = [] # TODO: change as above
 
     @dclayMethod(eventsSt='list<CityNS.classes.EventsSnapshot>')
     def aggregate_events(self, events_st):
@@ -52,7 +53,7 @@ class DKB(DataClayObject):
     # with_neighbors == true, return also neighbors. If with_tp == true, return only objects with trajectory prediction.
     # If connected == true, return connected car objects
     @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="set<Object>")
-    def get_objects(self, geohashes, with_neighbors, with_tp, connected):
+    def get_objects(self, geohashes=[], with_neighbors=False, with_tp=False, connected=False):
         objs = set()
         obj_refs = []
         # print("BEFORE FOR")
@@ -69,12 +70,13 @@ class DKB(DataClayObject):
                     obj = Object.get_by_alias(obj_ref)
                     # print("Object " + str(obj) + " considered")
                     # print("Geohash of obj: " + obj.geohash + " neighbors: " + str(geohash.neighbours(obj.geohash)))
-                    if obj.geohash in geohashes or with_neighbors and obj.geohash \
-                            in [el for n in geohashes for el in geohash.neighbours(n)]:
+                    if geohashes is None or len(geohashes) == 0 or obj.geohash in geohashes or with_neighbors is None \
+                            or with_neighbors and obj.geohash in [el for n in geohashes for el in geohash.neighbours(n)]:
                         # print("Object " + str(obj) + " INSIDE FIRST IF THAT CHECKS GEOHASHES")
                         if with_tp is None or not with_tp or with_tp and len(obj.trajectory_px) > 0:
                             # print("Object " + str(obj) + " INSIDE SECOND IF THAT CHECKS TP")
-                            if not connected or connected and obj.id_object in self.connectedCars+self.smartCars:
+                            if connected is None or not connected or connected and obj.type in \
+                                    self.connectedCars+self.smartCars:
                                 # TODO: objs type instead of obj.id_object
                                 # print("Object " + str(obj) + " INSIDE THIRD IF THAT CHECKS CONNECTED")
                                 objs.add(obj)
@@ -149,10 +151,10 @@ Object: Vehicle or Pedestrian detected
 """
 class Object(DataClayObject):
     """
-    @ClassField id_object int
+    @ClassField id_object str
     @ClassField type str
-    @ClassField speed float
-    @ClassField yaw float
+    @ClassField speed anything
+    @ClassField yaw anything
     @ClassField events_history list<CityNS.classes.Event>
     @ClassField trajectory_px list<float>
     @ClassField trajectory_py list<float>
@@ -160,7 +162,7 @@ class Object(DataClayObject):
     @ClassField geohash str
     """
     
-    @dclayMethod(id_object='int', obj_type='str', speed='float', yaw='float')
+    @dclayMethod(id_object='str', obj_type='str', speed='anything', yaw='anything')
     def __init__(self, id_object, obj_type, speed, yaw):
         self.id_object = id_object
         self.type = obj_type
@@ -210,11 +212,11 @@ class Event(DataClayObject):
     @ClassField id_event int
     @ClassField detected_object CityNS.classes.Object
     @ClassField timestamp anything
-    @ClassField longitude_pos float
-    @ClassField latitude_pos float
+    @ClassField longitude_pos anything
+    @ClassField latitude_pos anything
     """
-    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='float',
-                 latitude_pos='float')
+    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='anything',
+                 latitude_pos='anything')
     def __init__(self, id_event, detected_object, timestamp, longitude_pos, latitude_pos):
         self.id_event = id_event
         self.detected_object = detected_object
