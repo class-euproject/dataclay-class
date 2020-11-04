@@ -16,8 +16,8 @@ class DKB(DataClayObject):
     def __init__(self, k=10):
         self.kb = []
         self.K = k
-        self.connectedCars = [31, 32, 41] # TODO: change as below. Also replace definition from list<anything>
-        # dict<anything>: self.connectedCars = {31: 'X.X.X.X', 32: 'Y.Y.Y.Y'} # TODO: as dictionaries
+        self.connectedCars = ["31", "32", "41"] # TODO: change as below. Also replace definition from list<anything>
+        # dict<anything>: self.connectedCars = {"31": 'X.X.X.X', "32": 'Y.Y.Y.Y'} # TODO: as dictionaries
         self.smartCars = [] # TODO: change as above
 
     @dclayMethod(eventsSt='list<CityNS.classes.EventsSnapshot>')
