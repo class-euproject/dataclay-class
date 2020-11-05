@@ -21,7 +21,8 @@ Then, go to the `./deploy/` folder and execute the script that deploys the docke
 ./launch_dockers.sh
 ```
 
-In order to populate the dataClay database with information, a simulator code is provided to fill it with actual data. To run it, execute the following command:
+In order to populate the dataClay database with information, a simulator code is provided in the `app/` folder to fill it with actual data. To run it, execute the following command:
 ```python
+cd app/
 python3 run_demo.py
 ```

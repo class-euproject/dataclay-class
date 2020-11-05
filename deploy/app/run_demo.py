@@ -10,7 +10,7 @@ from CityNS.classes import Event, Object, EventsSnapshot, DKB
 
 def createDCObjects(KB):
     names_header = ["id_cam", "frame", "timestamp", "id_class", "lat", "lon", "geohash", "speed", "yaw", "id_obj"]
-    data = pd.read_csv("data/simulator.in", sep=" ", header=None, names=names_header)
+    data = pd.read_csv("../data/simulator.in", sep=" ", header=None, names=names_header)
     classes = ["person", "car", "truck", "bus", "motor", "bike", "rider", "traffic light", "traffic sign", "train"]
 
     for name, group in data.groupby(["frame"]):
