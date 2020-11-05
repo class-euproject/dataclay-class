@@ -50,36 +50,37 @@ class DKB(DataClayObject):
         return objs
 
     # returns a set of all relevant objects from K latest snapshots inside the specified geohashes. If
-    # with_neighbors == true, return also neighbors. If with_tp == true, return only objects with trajectory prediction.
-    # If connected == true, return connected car objects
+    # with_neighbors == True, return also neighbors; if == False, then return
+    # If with_tp == True, return only objects with trajectory prediction; if == False, then return only objects without
+    #           trajectory prediction. If == None, then return all objects (with/without tp)
+    # If connected == True, return connected car objects only, if == False then return all non-connected cars.
+    # If == None, then return all objects
     @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="set<Object>")
-    def get_objects(self, geohashes=[], with_neighbors=False, with_tp=False, connected=False):
+    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None):
         objs = set()
         obj_refs = []
-        # print("BEFORE FOR")
         for i, event_snap in enumerate(reversed(self.kb)): # get latest updates for objects
-            # print("i VALUE: " + str(i) + " on EventsSnapshot " + str(event_snap.snap_alias))
             if i > self.K:
-                # print("I > K: " + str(i) + " " + str(self.K))
                 break
             for obj_ref in event_snap.objects_refs:
-                # print("OBJECT REF: " + str(obj_ref) + " iterating")
                 if obj_ref not in obj_refs:
-                    # print("OBJECT REF " + str(obj_ref) + " FIRST TIME")
                     obj_refs.append(obj_ref)
                     obj = Object.get_by_alias(obj_ref)
-                    # print("Object " + str(obj) + " considered")
-                    # print("Geohash of obj: " + obj.geohash + " neighbors: " + str(geohash.neighbours(obj.geohash)))
                     if geohashes is None or len(geohashes) == 0 or obj.geohash in geohashes or with_neighbors is None \
                             or with_neighbors and obj.geohash in [el for n in geohashes for el in geohash.neighbours(n)]:
-                        # print("Object " + str(obj) + " INSIDE FIRST IF THAT CHECKS GEOHASHES")
-                        if with_tp is None or not with_tp or with_tp and len(obj.trajectory_px) > 0:
-                            # print("Object " + str(obj) + " INSIDE SECOND IF THAT CHECKS TP")
-                            if connected is None or not connected or connected and obj.type in \
-                                    self.connectedCars+self.smartCars:
-                                # TODO: objs type instead of obj.id_object
-                                # print("Object " + str(obj) + " INSIDE THIRD IF THAT CHECKS CONNECTED")
+                        if with_tp is None or not with_tp and len(obj.trajectory_px) == 0 \
+                                or with_tp and len(obj.trajectory_px) > 0:
+                            if connected is None or not connected and obj.type not in self.connectedCars+self.smartCars\
+                                    or connected and obj.type in self.connectedCars+self.smartCars:
                                 objs.add(obj)
+                            """
+                            if connected is None or not connected and obj.type not in self.connectedCars+self.smartCars\
+                                    or connected and obj.type in self.connectedCars+self.smartCars:
+                                objs.add(obj)
+                            elif 
+                                objs.add(obj)
+                            """
+
         return objs
 
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
@@ -153,8 +154,6 @@ class Object(DataClayObject):
     """
     @ClassField id_object str
     @ClassField type str
-    @ClassField speed anything
-    @ClassField yaw anything
     @ClassField events_history list<CityNS.classes.Event>
     @ClassField trajectory_px list<float>
     @ClassField trajectory_py list<float>
@@ -162,12 +161,10 @@ class Object(DataClayObject):
     @ClassField geohash str
     """
     
-    @dclayMethod(id_object='str', obj_type='str', speed='anything', yaw='anything')
-    def __init__(self, id_object, obj_type, speed, yaw):
+    @dclayMethod(id_object='str', obj_type='str')
+    def __init__(self, id_object, obj_type):
         self.id_object = id_object
         self.type = obj_type
-        self.speed = speed
-        self.yaw = yaw
         self.events_history = []
         self.trajectory_px = []
         self.trajectory_py = []
@@ -212,22 +209,27 @@ class Event(DataClayObject):
     @ClassField id_event int
     @ClassField detected_object CityNS.classes.Object
     @ClassField timestamp anything
+    @ClassField speed anything
+    @ClassField yaw anything
     @ClassField longitude_pos anything
     @ClassField latitude_pos anything
     """
-    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', longitude_pos='anything',
-                 latitude_pos='anything')
-    def __init__(self, id_event, detected_object, timestamp, longitude_pos, latitude_pos):
+    @dclayMethod(id_event='int', detected_object='CityNS.classes.Object', timestamp='anything', speed='anything',
+                 yaw='anything', longitude_pos='anything', latitude_pos='anything')
+    def __init__(self, id_event, detected_object, timestamp, speed, yaw, longitude_pos, latitude_pos):
         self.id_event = id_event
         self.detected_object = detected_object
         self.timestamp = timestamp
+        self.speed = speed
+        self.yaw = yaw
         self.longitude_pos = longitude_pos
         self.latitude_pos = latitude_pos
 
     @dclayMethod(return_='str')
     def __str__(self):
-        return "(long=%s,lat=%s,time=%s,id=%s)" % (str(self.longitude_pos), str(self.latitude_pos), str(self.timestamp),
-                                                   str(self.id_event))
+        return "(long=%s,lat=%s,time=%s,speed=%s,yaw=%s,id=%s)" % (str(self.longitude_pos), str(self.latitude_pos),
+                                                                   str(self.timestamp), str(self.speed), str(self.yaw),
+                                                                   str(self.id_event))
 
     @dclayMethod()
     def when_federated(self):
