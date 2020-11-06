@@ -49,12 +49,13 @@ class DKB(DataClayObject):
                     objs.append((obj.id_object, obj.trajectory_px, obj.trajectory_py, obj.trajectory_pt))
         return objs
 
-    # returns a set of all relevant objects from K latest snapshots inside the specified geohashes. If
-    # with_neighbors == True, return also neighbors; if == False, then return
-    # If with_tp == True, return only objects with trajectory prediction; if == False, then return only objects without
-    #           trajectory prediction. If == None, then return all objects (with/without tp)
-    # If connected == True, return connected car objects only, if == False then return all non-connected cars.
-    # If == None, then return all objects
+    # returns a set of all relevant objects from K latest snapshots inside the specified geohashes, based on:
+    # If geohashes set is None or empty, then return all relevant objects from latest K snapshots.
+    # If with_neighbors == True, return also neighbors; if == False, then return only geohashes specified in set.
+    # If with_tp == True, return only objects with trajectory prediction. If == False, then return only objects without
+    #           trajectory prediction. If == None, then return all objects (with/without tp).
+    # If connected == True, return connected car objects only. If == False then return all non-connected cars.
+    # If == None, then return all objects (connected and non-connected).
     @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="set<Object>")
     def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None):
         objs = set()
@@ -73,13 +74,6 @@ class DKB(DataClayObject):
                             if connected is None or not connected and obj.type not in self.connectedCars+self.smartCars\
                                     or connected and obj.type in self.connectedCars+self.smartCars:
                                 objs.add(obj)
-                            """
-                            if connected is None or not connected and obj.type not in self.connectedCars+self.smartCars\
-                                    or connected and obj.type in self.connectedCars+self.smartCars:
-                                objs.add(obj)
-                            elif 
-                                objs.add(obj)
-                            """
 
         return objs
 
