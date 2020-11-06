@@ -3,6 +3,14 @@
 This repository contains the file containing the data model and the docker files
 to deploy dataClay with the model.
 
+# Python dependencies
+
+The Python used is `3.6.9`. The following python packages must be installed as well:
+
+```
+python3 -m pip install geolib dataclay
+```
+
 # Build
 
 To build the dockers containing the data model defined below, use the script located in `./build/build_dockers.sh`, which generates the dataclay dockers.
