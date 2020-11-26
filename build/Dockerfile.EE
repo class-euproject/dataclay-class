@@ -3,6 +3,7 @@ FROM bscdataclay/dspython:2.5.py36.dev
 COPY ./deploy/deploy ${DATACLAY_HOME}/deploy
 RUN python -m pip install requests
 RUN python -m pip install geolib 
+RUN python -m pip install pygeohash 
 
 # Execute
 # Don't use CMD in order to keep compatibility with singularity container's generator

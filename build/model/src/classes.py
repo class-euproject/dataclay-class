@@ -7,11 +7,13 @@ class DKB(DataClayObject):
     """
     @ClassField kb list<CityNS.classes.EventsSnapshot>
     @ClassField K int
-    @ClassField connectedCars list<anything>
+    @ClassField connectedCars list<str>
     @ClassField smartCars list<anything>
 
     @dclayImportFrom geolib import geohash
     """
+    # kb should be a dict<timestamp, CityNS.classes.EventsSnapshot> so snapshots are ordered
+
     @dclayMethod(k='int')
     def __init__(self, k=10):
         self.kb = []
@@ -82,6 +84,42 @@ class DKB(DataClayObject):
         pass
 
 
+class ListOfObjects(DataClayObject):
+    """
+    @ClassField objects dict<str, CityNS.classes.Object>
+
+    @dclayImport threading
+    """
+
+    @dclayMethod()
+    def __init__(self):
+        self.objects = dict()
+
+    @dclayMethod()
+    def initialize_locks(self):
+        self.locks = dict()
+        # self.lock = threading.Lock()
+
+    @dclayMethod(object_id='str', object_class='str')
+    def get_or_create(self, object_id, object_class):
+        if object_id not in self.locks:
+            self.locks[object_id] = threading.Lock()
+        with self.locks[object_id]: 
+            if object_id not in self.objects:
+                obj = Object(object_id, object_class)
+                self.objects[object_id] = obj
+            return self.objects[object_id]
+
+class ListOfEvents(DataClayObject):
+    """
+    @ClassField events list<CityNS.classes.Event>
+    """
+
+    @dclayMethod(detected_events="list<CityNS.classes.Event>")
+    def __init__(self, detected_events):
+        self.events = detected_events
+
+
 """
 Events Snapshots: List of the objects detected in an snapshot. Each object
 contains a list of events (last event for current snapshot and events history).
@@ -89,13 +127,18 @@ contains a list of events (last event for current snapshot and events history).
 class EventsSnapshot(DataClayObject):
     """
     @ClassField objects_refs list<str>
+    @ClassField objects dict<str, CityNS.classes.Object>
     @ClassField snap_alias str
+
+    @dclayImportFrom geolib import geohash
+    @dclayImport pygeohash as pgh
     """
-    # @ClassField timestamp anything # TODO: to be added
+    # @ClassField timestamp anything # TODO: to be added based on value from Deduplicator (oldest timestamp from tkDNN sent to deduplicator) 
 
     @dclayMethod(alias='str')
     def __init__(self, alias):
         self.objects_refs = []
+        self.objects = dict()
         self.snap_alias = alias
 
     @dclayMethod(object_alias="str")
@@ -106,6 +149,40 @@ class EventsSnapshot(DataClayObject):
     @dclayMethod(return_='list<str>')
     def get_objects_refs(self):
         return self.objects_refs
+
+    @dclayMethod(events_detected='anything', list_objects='CityNS.classes.ListOfObjects')
+    def add_events_from_trackers(self, events_detected, list_objects):
+        from datetime import datetime
+        import uuid
+        classes = ["person", "car", "truck", "bus", "motor", "bike", "rider", "traffic light", "traffic sign", "train"]
+        # snapshot_ts = int(datetime.now().timestamp() * 1000) # TODO: replaced for below
+        snapshot_ts = events_detected[0]
+        for index, ev in enumerate(events_detected[1]):
+            id_cam = ev[0]
+            tracker_id = ev[1]
+            tracker_class = ev[2]
+            vel_pred = ev[3]
+            yaw_pred = ev[4]
+            lat = ev[5]
+            lon = ev[6]
+            # object_alias = "obj_" + str(index) # TODO: replaced by below
+            object_alias = "obj_" + str(id_cam) + "_" + str(tracker.id) 
+            obj = list_objects.get_or_create(object_alias, classes[tracker_class])
+            event = Event(uuid.uuid4().int, obj, snapshot_ts, vel_pred, yaw_pred, float(lon), float(lat))
+            self.add_object_refs(object_alias)
+            obj.add_event(event)
+            obj.geohash = pgh.encode(lat, lon, precision=7)
+            if obj.id_object not in self.objects:
+                self.objects[obj.id_object] = obj
+
+    @dclayMethod(detected_events="CityNS.classes.ListOfEvents")
+    def add_events(self, detected_events):
+        for event in detected_events.events:
+            obj = event.detected_object
+            obj.add_event(event)
+            obj.geohash = pgh.encode(event.latitude_pos, event.longitude_pos, precision=7)
+            if obj.id_object not in self.objects:
+                self.objects[obj.id_object] = obj
 
     @dclayMethod() 
     def when_federated(self):
@@ -138,7 +215,6 @@ class EventsSnapshot(DataClayObject):
         self.objects_refs = list()
 
 
-# TODO: add new class that inherits from object which is smartCar and connectedCar
 """
 Object: Vehicle or Pedestrian detected
         Objects are classified by type: Pedestrian, Bicycle, Car, Track, ...
@@ -148,18 +224,19 @@ class Object(DataClayObject):
     """
     @ClassField id_object str
     @ClassField type str
-    @ClassField events_history list<CityNS.classes.Event>
+    @ClassField events_history dict<int, CityNS.classes.Event>
     @ClassField trajectory_px list<float>
     @ClassField trajectory_py list<float>
     @ClassField trajectory_pt list<anything>
     @ClassField geohash str
     """
+    # TODO: events_history changed into dict<int, CityNS.classes.Event> instead of list<...>. collections.OrderedDict(sorted(events_history.items()))
     
     @dclayMethod(id_object='str', obj_type='str')
     def __init__(self, id_object, obj_type):
         self.id_object = id_object
         self.type = obj_type
-        self.events_history = []
+        self.events_history = dict()
         self.trajectory_px = []
         self.trajectory_py = []
         self.trajectory_pt = []
@@ -167,7 +244,8 @@ class Object(DataClayObject):
 
     @dclayMethod(event='CityNS.classes.Event')
     def add_event(self, event):
-        self.events_history.append(event)
+        # self.events_history.append(event)
+        self.events_history[event.timestamp] = event
 
     # Updates the trajectory prediction
     @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>')
@@ -179,12 +257,12 @@ class Object(DataClayObject):
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(return_="anything")
     def get_events_history(self):
-        from collections import deque
+        from collections import deque, OrderedDict
         # Events in following format(dqx, dqy, dqt)
         dqx = deque()
         dqy = deque()
         dqt = deque()
-        for event in self.events_history:
+        for event in OrderedDict(sorted(self.events_history.items())):
             dqx.append(event.longitude_pos)
             dqy.append(event.latitude_pos)
             dqt.append(event.timestamp)
@@ -192,7 +270,7 @@ class Object(DataClayObject):
 
     @dclayMethod(return_='str')
     def __str__(self):
-        return "Object %s of type %s with Events %s" % (str(self.id_object), str(self.type), str(self.events_history))
+        return "Object %s of type %s with Events %s" % (str(self.id_object), str(self.type), str(self.events_history)) # str(self.events_history.values())
 
 
 """
