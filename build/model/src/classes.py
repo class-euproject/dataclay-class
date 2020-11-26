@@ -155,7 +155,7 @@ class EventsSnapshot(DataClayObject):
         from datetime import datetime
         import uuid
         classes = ["person", "car", "truck", "bus", "motor", "bike", "rider", "traffic light", "traffic sign", "train"]
-        # snapshot_ts = int(datetime.now().timestamp() * 1000) # TODO: replaced for below
+        # snapshot_ts = int(datetime.now().timestamp() * 1000) # replaced for below
         snapshot_ts = events_detected[0]
         for index, ev in enumerate(events_detected[1]):
             id_cam = ev[0]
@@ -165,7 +165,7 @@ class EventsSnapshot(DataClayObject):
             yaw_pred = ev[4]
             lat = ev[5]
             lon = ev[6]
-            # object_alias = "obj_" + str(index) # TODO: replaced by below
+            # object_alias = "obj_" + str(index) # replaced by below
             object_alias = "obj_" + str(id_cam) + "_" + str(tracker.id) 
             obj = list_objects.get_or_create(object_alias, classes[tracker_class])
             event = Event(uuid.uuid4().int, obj, snapshot_ts, vel_pred, yaw_pred, float(lon), float(lat))
@@ -175,6 +175,9 @@ class EventsSnapshot(DataClayObject):
             if obj.id_object not in self.objects:
                 self.objects[obj.id_object] = obj
 
+    """
+    Method that stores (make_persistent) all events in one single call to avoid extra visits to dataClay
+    """
     @dclayMethod(detected_events="CityNS.classes.ListOfEvents")
     def add_events(self, detected_events):
         for event in detected_events.events:
@@ -230,7 +233,7 @@ class Object(DataClayObject):
     @ClassField trajectory_pt list<anything>
     @ClassField geohash str
     """
-    # TODO: events_history changed into dict<int, CityNS.classes.Event> instead of list<...>. collections.OrderedDict(sorted(events_history.items()))
+    # events_history changed into dict<int, CityNS.classes.Event> instead of list<...>. collections.OrderedDict(sorted(events_history.items()))
     
     @dclayMethod(id_object='str', obj_type='str')
     def __init__(self, id_object, obj_type):

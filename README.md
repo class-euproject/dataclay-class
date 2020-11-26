@@ -19,6 +19,8 @@ To build the dockers containing the data model defined below, use the script loc
 
 <p align="center"><img src="./imgs/class-dataclay-model.png" alt="DataClay Model" title="DataClay Model"/></p>
 
+`detected_object` attribute in `Event` class is needed for dataClay federation purposes. `objects_refs` attribute in `EventSnapshot` class is provided for PyWren to retrieve objects remotely. `objects` attribute in `EventSnapshot` is used to store all objects in one single make\_persistent call to avoid extra visits to dataClay.
+
 
 # Deployment
 
