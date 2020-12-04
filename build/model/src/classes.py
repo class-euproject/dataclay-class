@@ -166,7 +166,7 @@ class EventsSnapshot(DataClayObject):
             lat = ev[5]
             lon = ev[6]
             # object_alias = "obj_" + str(index) # replaced by below
-            object_alias = "obj_" + str(id_cam) + "_" + str(tracker.id) 
+            object_alias = "obj_" + str(id_cam) + "_" + str(tracker_id) 
             obj = list_objects.get_or_create(object_alias, classes[tracker_class])
             event = Event(uuid.uuid4().int, obj, snapshot_ts, vel_pred, yaw_pred, float(lon), float(lat))
             self.add_object_refs(object_alias)
@@ -265,7 +265,7 @@ class Object(DataClayObject):
         dqx = deque()
         dqy = deque()
         dqt = deque()
-        for event in OrderedDict(sorted(self.events_history.items())):
+        for _, event in OrderedDict(sorted(self.events_history.items())).items():
             dqx.append(event.longitude_pos)
             dqy.append(event.latitude_pos)
             dqt.append(event.timestamp)
