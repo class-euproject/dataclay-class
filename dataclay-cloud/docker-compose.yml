@@ -87,7 +87,7 @@ services:
     volumes:
       - dataclay-init:/srv/dataclay/shared:ro
     environment:
-      - LOGICMODULE_PORT_TCP=21034
+      - LOGICMODULE_PORT_TCP=11034
       - LOGICMODULE_HOST=logicmodule
       - USER=CityUser
       - PASS=p4ssw0rd
