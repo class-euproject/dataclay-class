@@ -7,5 +7,5 @@ echo "Launching dockers again"
 docker-compose up --build -d # launches also the docker that contains the 
 			     # stubs, creates the DKB and retrieves the objects 
 			     # send through federeation
-
+./GetStubs.sh
 
