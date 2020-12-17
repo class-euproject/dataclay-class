@@ -60,7 +60,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
 
   dcinitializer:
-    image: "bscdataclay/dataclay-initializer"
+    image: "bscdataclay/initializer"
     depends_on:
       - logicmodule
     volumes:
