@@ -1,0 +1,95 @@
+version: '3.5'
+volumes:
+  dataclay-init:
+    driver: local
+services:
+  logicmodule:
+    image: "bscdataclay/logicmodule:alpine"
+    command: "${COMMAND_OPTS}"
+    ports:
+      - "11034:11034"
+    environment:
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=logicmodule
+      - DATACLAY_ADMIN_USER=admin
+      - DATACLAY_ADMIN_PASSWORD=admin
+    stop_grace_period: 5m
+    healthcheck:
+       interval: 5s
+       retries: 10
+       test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
+         
+  dsjava:
+    image: "bscdataclay/dsjava:alpine"
+    command: "${COMMAND_OPTS}"
+    ports:
+      - "2127:2127"
+    depends_on:
+      - logicmodule
+    environment:
+      - DATASERVICE_NAME=DS1
+      - DATASERVICE_JAVA_PORT_TCP=2127
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=logicmodule
+      # - DATASERVICE_HOST=dsjava
+    stop_grace_period: 5m
+    healthcheck:
+       interval: 5s
+       retries: 10
+       test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
+       
+  dspython:
+    image: "bscdataclay/dspython:2.5.py36-alpine"
+    command: ""
+    ports:
+      - "6867:6867"
+    depends_on:
+      - logicmodule
+      - dsjava
+    environment:
+      - DATASERVICE_NAME=DS1
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=logicmodule
+      - PYCLAY_LIBS=requests geolib pygeohash
+      - DATASERVICE_PYTHON_PORT_TCP=6867
+      # - DATASERVICE_HOST=dspython
+    stop_grace_period: 5m
+    healthcheck:
+       interval: 5s
+       retries: 10
+       test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
+
+  dcinitializer:
+    image: "bscdataclay/dataclay-initializer"
+    depends_on:
+      - logicmodule
+    volumes:
+      - dataclay-init:/srv/dataclay/shared
+      - ./model/:/model/:ro
+    environment:
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=logicmodule
+      - USER=CityUser
+      - PASS=p4ssw0rd
+      - DATASET=City
+      - PYTHON_MODELS_PATH=/model/src
+      - PYTHON_NAMESPACES=CityNS
+    healthcheck:
+      interval: 5s
+      retries: 10
+      test: [ "CMD-SHELL", "/dataclay-initializer/health_check.sh" ]
+
+  retrieve-objects:
+    image: retrieve-objects
+    build: retrieve-objects
+    depends_on:
+      - dcinitializer
+    volumes:
+      - dataclay-init:/srv/dataclay/shared:ro
+    environment:
+      - LOGICMODULE_PORT_TCP=21034
+      - LOGICMODULE_HOST=logicmodule
+      - USER=CityUser
+      - PASS=p4ssw0rd
+      - DATASET=City
+      - NAMESPACE=CityNS
