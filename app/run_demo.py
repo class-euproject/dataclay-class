@@ -30,6 +30,7 @@ def createDCObjects(KB):
                 eventsSnapshot.add_object_refs(row["id_obj"])
             event = Event(random.random(), eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), row["lon"], row["lat"])
             eventObject.geohash = row["geohash"][0:7]
+            eventsSnapshot.timestamp = row["timestamp"]
 
             eventObject.add_event(event)
         eventsSnapshot.make_persistent("events_" + str(name))
