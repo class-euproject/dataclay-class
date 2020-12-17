@@ -82,6 +82,7 @@ services:
 
   retrieve-objects:
     image: retrieve-objects
+    network_mode: host
     build: retrieve-objects
     depends_on:
       - dcinitializer
@@ -89,7 +90,7 @@ services:
       - dataclay-init:/srv/dataclay/shared:ro
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=logicmodule
+      - LOGICMODULE_HOST=localhost
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
