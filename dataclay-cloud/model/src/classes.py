@@ -84,8 +84,8 @@ class DKB(DataClayObject):
                             if connected is None or not connected and obj_type not in self.connectedCars\
                                     or connected and obj_type in self.connectedCars:
                                 # objs.add(obj)
-                                objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash))
-
+                                # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, list(OrderedDict(sorted(obj.events_history.items()).values()))))
+                                objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, [list(ev.convert_to_dict().values()) for ev in list(OrderedDict(sorted(obj.events_history.items())).values())]))
         return objs
 
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
