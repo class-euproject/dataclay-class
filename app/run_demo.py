@@ -28,6 +28,7 @@ def createDCObjects(KB):
                 eventObject.make_persistent(row["id_obj"])
             if row["id_obj"] not in eventsSnapshot.objects_refs:
                 eventsSnapshot.add_object_refs(row["id_obj"])
+                eventsSnapshot.add_object(eventObject)
             event = Event(random.random(), eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), row["lon"], row["lat"])
             eventObject.geohash = row["geohash"][0:7]
             eventsSnapshot.timestamp = row["timestamp"]

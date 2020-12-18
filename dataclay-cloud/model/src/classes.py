@@ -244,6 +244,11 @@ class EventsSnapshot(DataClayObject):
     def add_object_refs(self, object_alias):
         self.objects_refs.append(object_alias)
 
+    ## FOR THE SIMULATOR ONLY ##
+    @dclayMethod(obj="CityNS.classes.Object")
+    def add_object(self, obj):
+        self.objects[obj.id_object] = obj
+
     # Returns the list of Object refs
     @dclayMethod(return_='list<str>')
     def get_objects_refs(self):
