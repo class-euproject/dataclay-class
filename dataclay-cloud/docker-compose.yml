@@ -40,7 +40,8 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
        
   dspython:
-    image: "bscdataclay/dspython:2.5.py36-alpine"
+    # image: "bscdataclay/dspython:2.5.py36-alpine"
+    image: "bscdataclay/dspython:2.5.py36-slim"
     command: ""
     ports:
       - "6867:6867"
@@ -51,7 +52,7 @@ services:
       - DATASERVICE_NAME=DS1
       - LOGICMODULE_PORT_TCP=11034
       - LOGICMODULE_HOST=logicmodule
-      - PYCLAY_LIBS=requests geolib pygeohash
+      - PYCLAY_LIBS=requests geolib pygeohash numpy
       - DATASERVICE_PYTHON_PORT_TCP=6867
       # - DATASERVICE_HOST=dspython
     stop_grace_period: 5m
