@@ -71,7 +71,8 @@ class DKB(DataClayObject):
             if i > self.K:
                 break
             for obj in event_snap.objects.values():
-                id_object = obj.id_object 
+                # id_object = obj.id_object # TODO: retrieval_id instead of id_object
+                id_object = obj.retrieval_id # TODO: retrieval_id instead of id_object
                 if id_object not in obj_refs:
                     obj_refs.append(id_object)
                     geohash = obj.geohash
@@ -83,9 +84,9 @@ class DKB(DataClayObject):
                             obj_type = obj.type
                             if connected is None or not connected and obj_type not in self.connectedCars\
                                     or connected and obj_type in self.connectedCars:
-                                # objs.add(obj)
                                 # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, [list(ev.convert_to_dict().values()) for ev in list(OrderedDict(sorted(obj.events_history.items())).values())]))
                                 objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, obj.get_events_history()))
+
         return objs
 
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
@@ -205,7 +206,8 @@ class FederationInfo(DataClayObject):
                     trigger = 'tp-trigger'
                     url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
                     user_pass = auth_key.split(':')
-                    alias = snap_alias
+                    # alias = snap_alias # TODO: IBM is using DKB only, not working with EventsSnapshot directly
+                    alias = "DKB"
                     snapshot.session.post(url, params={'blocking': blocking, 'result': result},
                         json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]), verify=False) # keep alive the connection
                 except Exception:
@@ -329,6 +331,7 @@ class Object(DataClayObject):
     @ClassField trajectory_py list<float>
     @ClassField trajectory_pt list<int>
     @ClassField geohash str
+    @ClassField retrieval_id str
     """
     
     @dclayMethod(id_object='str', obj_type='str')
@@ -340,6 +343,7 @@ class Object(DataClayObject):
         self.trajectory_py = []
         self.trajectory_pt = []
         self.geohash = ""
+        self.retrieval_id = "" # TODO: added for retrieval purposes for IBM
 
     @dclayMethod(snap_timestamp='int', return_="dict<str, anything>")
     def convert_to_dict(self, snap_timestamp):
@@ -356,6 +360,7 @@ class Object(DataClayObject):
     # Updates the trajectory prediction
     @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>')
     def add_prediction(self, tpx, tpy, tpt):
+        import numpy
         self.trajectory_px = tpx
         self.trajectory_py = tpy
         self.trajectory_pt = tpt

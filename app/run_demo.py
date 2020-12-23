@@ -1,6 +1,9 @@
 import random
 from dataclay.api import init, finish
+from dataclay.api import get_backend_id_by_name
+from dataclay import getRuntime
 import pandas as pd
+import uuid
 
 # Init dataClay session
 init()
@@ -21,15 +24,16 @@ def createDCObjects(KB):
                 obj_type = classes[row["id_class"]]
             else: # for smart cars and connected cars
                 obj_type = str(row["id_class"])
-            try:
-                eventObject = Object.get_by_alias(row["id_obj"])
-            except:
-                eventObject = Object(row["id_obj"], obj_type)
-                eventObject.make_persistent(row["id_obj"])
-            obj_id = str(row["id_obj"]) + ":" + str(eventObject.get_class_extradata().class_id)
+
+            eventObject = KB.get_or_create(row["id_obj"], obj_type)
+            eventObject.make_persistent()
+
+            obj_id = str(eventObject.get_object_id()) + ":" + str(eventObject.get_class_extradata().class_id)
             if obj_id not in eventsSnapshot.objects_refs:
                 eventsSnapshot.add_object_refs(obj_id)
                 eventsSnapshot.add_object(eventObject)
+                eventObject.retrieval_id = obj_id # TODO: add this in model and update get_objects() in DKB to return this instead of id_object
+
             event = Event(random.random(), eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), row["lon"], row["lat"])
             eventObject.geohash = row["geohash"][0:7]
             eventsSnapshot.timestamp = row["timestamp"]
@@ -38,13 +42,14 @@ def createDCObjects(KB):
         eventsSnapshot.make_persistent("events_" + str(name))
         KB.add_events_snapshot(eventsSnapshot)
 
-
 if __name__ == "__main__":
+    backend_id = get_backend_id_by_name("DS1")
     try:
         KB = DKB.get_by_alias("DKB")
-        KB.reset_dkb()
+        # KB.reset_dkb()
     except Exception:
         KB = DKB()
+        KBob.cloud_backend_id = backend_id
         KB.make_persistent(alias="DKB")
     createDCObjects(KB)
     finish()
