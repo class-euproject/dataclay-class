@@ -189,9 +189,11 @@ class FederationInfo(DataClayObject):
                     class_id = obj.get_class_extradata().class_id
                     snapshot_objects_refs.append(str(object_id) + ":" + str(class_id))
                     obj.geohash = geohash
+                    obj.retrieval_id = str(object_id) + ":" + str(class_id)
                     event = Event(event_dict["id_event"], obj, event_dict["timestamp"], 
                             event_dict["speed"], event_dict["yaw"], event_dict["longitude_pos"], event_dict["latitude_pos"])
                     obj.add_event(event)
+                    snapshot.objects[obj.id_object] = obj
 
                 snapshot.objects_refs = snapshot_objects_refs
                 kb.add_events_snapshot(snapshot)
