@@ -56,6 +56,7 @@ services:
       - LOGICMODULE_HOST=192.168.50.103
       - PYCLAY_LIBS=requests geolib pygeohash numpy
       - DATASERVICE_HOST=192.168.50.103
+      - DATASERVICE_PYTHON_PORT_TCP=6867
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
