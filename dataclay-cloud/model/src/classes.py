@@ -224,21 +224,20 @@ class FederationInfo(DataClayObject):
                     namespace = '_'
                     blocking = 'true'
                     result = 'true'
-                    trigger = 'tp-trigger'
-                    url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
-                    # TP_ACTION = 'tpAction'
-                    # url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + TP_ACTION + \
-                    #      '?blocking=true&result=true'
+                    # trigger = 'tp-trigger'
+                    # url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
+                    TP_ACTION = 'tpAction'
+                    url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + TP_ACTION + \
+                          '?blocking=true&result=true'
                     user_pass = auth_key.split(':')
-                    # alias = snap_alias
                     alias = "DKB"
                     response = snapshot.session.post(url, params={'blocking': blocking, 'result': result},
                                                      json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]),
                                                      verify=False)  # keep alive the connection
-                    # print(f"RESPONSE TEXT: {response.text}")
-                    # for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
-                    #        with_tp=True, events_length_max=20, events_length_min=5):
-                    #    print(f"LOG FILE: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
+                    print(f"RESPONSE TEXT: {response.text}")
+                    for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
+                            with_tp=True, events_length_max=20, events_length_min=5):
+                        print(f"LOG FILE: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
                 except Exception:
                     traceback.print_exc()
                     print("Error in REST API connection with Modena.")
@@ -424,7 +423,8 @@ class Object(DataClayObject):
     @dclayMethod(return_='str')
     def __repr__(self):
         num_events = len(self.events_history)
-        return f"Object {self.id_object} of type {self.type} with {num_events} Events {self.events_history}" # str(self.events_history.values())
+        return f"Object {self.id_object} of type {self.type} with {num_events} Events {self.events_history}"
+        # str(self.events_history.values())
 
 
 """
