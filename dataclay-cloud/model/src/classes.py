@@ -7,6 +7,7 @@ class DKB(DataClayObject):
     """
     @ClassField kb dict<int, CityNS.classes.EventsSnapshot>
     @ClassField K int
+    @ClassField frame_number int
     @ClassField connectedCars list<str>
     @ClassField cloud_backend_id anything
     @ClassField list_objects CityNS.classes.ListOfObjects
@@ -20,6 +21,7 @@ class DKB(DataClayObject):
     def __init__(self, k=10):
         self.kb = dict()
         self.K = k
+        self.frame_number = -1
         self.connectedCars = ["31", "32", "41"] # TODO: change as below. Also replace definition from list<anything>
         # dict<anything>: self.connectedCars = {"31": 'X.X.X.X', "32": 'Y.Y.Y.Y'} # TODO: as dictionaries
         self.cloud_backend_id = None
@@ -41,6 +43,7 @@ class DKB(DataClayObject):
     @dclayMethod(event_snp='CityNS.classes.EventsSnapshot')
     def add_events_snapshot(self, event_snp): 
         self.kb[event_snp.timestamp] = event_snp
+        self.frame_number += 1
 
     @dclayMethod(return_="list<anything>")
     def get_objects_from_dkb(self):
@@ -62,8 +65,10 @@ class DKB(DataClayObject):
     # If connected == True, return connected car objects only. If == False then return all non-connected cars.
     # If == None, then return all objects (connected and non-connected).
     # @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="set<CityNS.classes.Object>") # return tuple instead of object
-    @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="list<anything>")
-    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None):
+    @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', events_length_max='int',
+                 events_length_min='int', return_="list<anything>")
+    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None, events_length_max=20,
+                    events_length_min=5):
         objs = []
         obj_refs = []
         # for i, (_, event_snap) in enumerate(reversed(OrderedDict(sorted(self.kb.items()))).items()): # get latest updates for objects
@@ -72,9 +77,9 @@ class DKB(DataClayObject):
                 break
             for obj in event_snap.objects.values():
                 # id_object = obj.id_object # TODO: retrieval_id instead of id_object
-                id_object = obj.retrieval_id # TODO: retrieval_id instead of id_object
-                if id_object not in obj_refs:
-                    obj_refs.append(id_object)
+                retrieval_id = obj.retrieval_id # TODO: retrieval_id instead of id_object
+                if retrieval_id not in obj_refs:
+                    obj_refs.append(retrieval_id)
                     geohash = obj.geohash
                     if geohashes is None or len(geohashes) == 0 or geohash in geohashes or with_neighbors is None \
                             or with_neighbors and geohash in [el for n in geohashes for el in geohash.neighbours(n)]:
@@ -84,8 +89,21 @@ class DKB(DataClayObject):
                             obj_type = obj.type
                             if connected is None or not connected and obj_type not in self.connectedCars\
                                     or connected and obj_type in self.connectedCars:
-                                # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, [list(ev.convert_to_dict().values()) for ev in list(OrderedDict(sorted(obj.events_history.items())).values())]))
-                                objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash, obj.get_events_history()))
+                                # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
+                                #     [list(ev.convert_to_dict().values()) for ev in list
+                                #     (OrderedDict(sorted(obj.events_history.items())).values())]))
+                                # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
+                                #     obj.get_events_history()))
+                                dequeues = obj.get_events_history(events_length_max)
+                                # dequeues[2] -> timestamp dequeue and [-1] to get last value
+                                if len(dequeues[0]) >= events_length_min:
+                                    if (with_tp is None or not with_tp) and dequeues[2][-1] > obj.timestamp_last_tp_comp\
+                                            or with_tp:  # condition is only active for the TP invocation
+                                        # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
+                                        #              geohash, dequeues, obj.id_object, self.frame_number))
+                                        objs.append((retrieval_id, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
+                                                     geohash, dequeues, obj.id_object,
+                                                     event_snap.snap_alias.split("_")[1]))
 
         return objs
 
@@ -191,7 +209,8 @@ class FederationInfo(DataClayObject):
                     obj.geohash = geohash
                     obj.retrieval_id = str(object_id) + ":" + str(class_id)
                     event = Event(event_dict["id_event"], obj, event_dict["timestamp"], 
-                            event_dict["speed"], event_dict["yaw"], event_dict["longitude_pos"], event_dict["latitude_pos"])
+                                  event_dict["speed"], event_dict["yaw"], event_dict["longitude_pos"],
+                                  event_dict["latitude_pos"])
                     obj.add_event(event)
                     snapshot.objects[obj.id_object] = obj
 
@@ -207,11 +226,19 @@ class FederationInfo(DataClayObject):
                     result = 'true'
                     trigger = 'tp-trigger'
                     url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
+                    # TP_ACTION = 'tpAction'
+                    # url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + TP_ACTION + \
+                    #      '?blocking=true&result=true'
                     user_pass = auth_key.split(':')
-                    # alias = snap_alias # TODO: IBM is using DKB only, not working with EventsSnapshot directly
+                    # alias = snap_alias
                     alias = "DKB"
-                    snapshot.session.post(url, params={'blocking': blocking, 'result': result},
-                        json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]), verify=False) # keep alive the connection
+                    response = snapshot.session.post(url, params={'blocking': blocking, 'result': result},
+                                                     json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]),
+                                                     verify=False)  # keep alive the connection
+                    # print(f"RESPONSE TEXT: {response.text}")
+                    # for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
+                    #        with_tp=True, events_length_max=20, events_length_min=5):
+                    #    print(f"LOG FILE: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
                 except Exception:
                     traceback.print_exc()
                     print("Error in REST API connection with Modena.")
@@ -278,7 +305,8 @@ class EventsSnapshot(DataClayObject):
             yaw_pred = ev[4]
             lat = ev[5]
             lon = ev[6]
-            object_alias = "obj_" + str(id_cam) + "_" + str(tracker_id)
+            #object_alias = str(id_cam) + "_" + str(tracker_id)
+            object_alias = "20939_" + str(tracker_id) # TODO: hardcoded cam ID because deduplicator id is wrong
             obj = kb.get_or_create(object_alias, classes[tracker_class])
             event = Event(uuid.uuid4().int, obj, self.timestamp, vel_pred, yaw_pred, float(lon), float(lat))
             # object_id = obj.get_object_id()
@@ -334,6 +362,7 @@ class Object(DataClayObject):
     @ClassField trajectory_pt list<int>
     @ClassField geohash str
     @ClassField retrieval_id str
+    @ClassField timestamp_last_tp_comp int
     """
     
     @dclayMethod(id_object='str', obj_type='str')
@@ -346,6 +375,7 @@ class Object(DataClayObject):
         self.trajectory_pt = []
         self.geohash = ""
         self.retrieval_id = "" # TODO: added for retrieval purposes for IBM
+        self.timestamp_last_tp_comp = -1
 
     @dclayMethod(snap_timestamp='int', return_="dict<str, anything>")
     def convert_to_dict(self, snap_timestamp):
@@ -360,25 +390,35 @@ class Object(DataClayObject):
         self.events_history[event.timestamp] = event
 
     # Updates the trajectory prediction
-    @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>')
-    def add_prediction(self, tpx, tpy, tpt):
+    @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>', timestamp_last_tp_comp='int')
+    def add_prediction(self, tpx, tpy, tpt, timestamp_last_tp_comp):
         import numpy
         self.trajectory_px = tpx
         self.trajectory_py = tpy
         self.trajectory_pt = tpt
+        self.timestamp_last_tp_comp = timestamp_last_tp_comp
     
     # Returns the Object and its Events history (Deque format)
-    @dclayMethod(return_="anything")
-    def get_events_history(self):
+    @dclayMethod(events_length_max='int', return_="anything")
+    def get_events_history(self, events_length_max):
         from collections import deque, OrderedDict
         # Events in following format(dqx, dqy, dqt)
         dqx = deque()
         dqy = deque()
         dqt = deque()
-        for _, event in OrderedDict(sorted(self.events_history.items())).items():
-            dqx.append(event.longitude_pos)
-            dqy.append(event.latitude_pos)
+        i = 0
+        for _, event in reversed(OrderedDict(sorted(self.events_history.items())).items()):
+            if i == events_length_max:
+                break
+            """
+            dqx.append(event.latitude_pos)
+            dqy.append(event.longitude_pos)
             dqt.append(event.timestamp)
+            """
+            dqx.insert(0, event.latitude_pos)
+            dqy.insert(0, event.longitude_pos)
+            dqt.insert(0, event.timestamp)  # dequeues should be ordered with increasingly timestamps
+            i += 1
         return dqx, dqy, dqt
 
     @dclayMethod(return_='str')
@@ -413,8 +453,10 @@ class Event(DataClayObject):
 
     @dclayMethod(return_='dict<str, anything>')
     def convert_to_dict(self):
-        return {"id_event": self.id_event, "detected_object": self.detected_object.id_object, "timestamp": self.timestamp, 
-                "speed": self.speed, "yaw": self.yaw, "longitude_pos": self.longitude_pos, "latitude_pos": self.latitude_pos} 
+        return {"id_event": self.id_event, "detected_object": self.detected_object.id_object,
+                "timestamp": self.timestamp,
+                "speed": self.speed, "yaw": self.yaw, "latitude_pos": self.latitude_pos,
+                "longitude_pos": self.longitude_pos}
         
     @dclayMethod(return_='str')
     def __repr__(self):
