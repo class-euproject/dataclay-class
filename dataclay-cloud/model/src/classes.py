@@ -160,6 +160,7 @@ class FederationInfo(DataClayObject):
 
     @dclayImport traceback
     @dclayImport uuid
+    @dlcayImportFrom dataclay import getRuntime
     """
 
     @dclayMethod(snapshots='list<CityNS.classes.EventsSnapshot>')
@@ -181,6 +182,7 @@ class FederationInfo(DataClayObject):
 
     @dclayMethod() 
     def when_federated(self):
+        from dataclay import getRuntime
         try:
             kb = DKB.get_by_alias("DKB")
             backend_id = kb.cloud_backend_id
@@ -224,20 +226,34 @@ class FederationInfo(DataClayObject):
                     namespace = '_'
                     blocking = 'true'
                     result = 'true'
-                    # trigger = 'tp-trigger'
+                    # trigger = 'tp-trigger' # asynchronous invocation
                     # url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
-                    TP_ACTION = 'tpAction'
-                    url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + TP_ACTION + \
+                    tp_action = 'tpAction' # synchronous invocation
+                    cd_action = 'cdAction'
+                    url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + tp_action + \
+                          '?blocking=true&result=true'
+                    urlCD = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + cd_action + \
                           '?blocking=true&result=true'
                     user_pass = auth_key.split(':')
                     alias = "DKB"
+                    list_objects_info = []
+                    for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
+                            events_length_max=20, events_length_min=5):
+                        list_objects_info.append((frame, obj_events_hist[2][-1], retr_id))
+                        print(f"PROVA: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
                     response = snapshot.session.post(url, params={'blocking': blocking, 'result': result},
                                                      json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]),
                                                      verify=False)  # keep alive the connection
                     print(f"RESPONSE TEXT: {response.text}")
-                    for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
-                            with_tp=True, events_length_max=20, events_length_min=5):
-                        print(f"LOG FILE: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
+                    #for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
+                    #        with_tp=True, events_length_max=20, events_length_min=5):
+                    for frame, obj_hist, retr_id in list_objects_info:
+                        dc_obj_id, class_id = retr_id.split(":")
+                        dc_obj_id = uuid.UUID(dc_obj_id)
+                        class_id = uuid.UUID(class_id)
+                        obj = getRuntime().get_object_by_id(dc_obj_id, hint=backend_id, class_id=class_id)
+                        print(f"LOG FILE: {frame} {obj_hist} {obj.id_object} {obj.trajectory_px} {obj.trajectory_py} \
+                                {obj.trajectory_pt}")
                 except Exception:
                     traceback.print_exc()
                     print("Error in REST API connection with Modena.")
@@ -294,8 +310,8 @@ class EventsSnapshot(DataClayObject):
         from datetime import datetime
         import uuid
         classes = ["person", "car", "truck", "bus", "motor", "bike", "rider", "traffic light", "traffic sign", "train"]
-        # snapshot_ts = int(datetime.now().timestamp() * 1000) # replaced for below
-        self.timestamp = events_detected[0]
+        # self.timestamp = events_detected[0] # TODO: should be using timestamp coming from tkDNN
+        self.timestamp = 1611592497727 + int(self.snap_alias.split("_")[1]) * 400  # TODO: to debug purpose only
         for index, ev in enumerate(events_detected[1]):
             id_cam = ev[0]
             tracker_id = ev[1]
