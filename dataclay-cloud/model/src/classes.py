@@ -139,6 +139,11 @@ class ListOfObjects(DataClayObject):
             if object_id not in self.objects:
                 obj = Object(object_id, object_class, x, y, w, h)
                 self.objects[object_id] = obj
+            else:
+                self.objects[object_id].pixel_x = x
+                self.objects[object_id].pixel_y = y
+                self.objects[object_id].pixel_w = w
+                self.objects[object_id].pixel_h = h
             return self.objects[object_id]
 
     @dclayMethod(return_="dict<str, anything>")
@@ -221,6 +226,23 @@ class FederationInfo(DataClayObject):
                                   event_dict["latitude_pos"])
                     obj.add_event(event)
                     snapshot.objects[obj.id_object] = obj
+                    ### DEBUG ###
+                    id_cam = obj_id.split("_")[0]
+                    iteration = snap_alias.split("_")[1]
+                    ts = snapshot.timestamp
+                    lat = event_dict["latitude_pos"]
+                    lon = event_dict["longitude_pos"]
+                    speed = event_dict["speed"]
+                    yaw = event_dict["yaw"]
+                    if obj.frame_last_tp != -1:
+                        print(
+                            f"WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
+                            {obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {next(reversed(sorted(obj.events_history)))} \
+                            {obj.trajectory_px} {obj.trajectory_py} {obj.trajectory_pt}")
+                    else:
+                        print(
+                            f"WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
+                            {obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {-1} 0,0,0,0,0 0,0,0,0,0 0,0,0,0,0")
 
                 snapshot.objects_refs = snapshot_objects_refs
                 kb.add_events_snapshot(snapshot)
