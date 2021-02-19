@@ -103,7 +103,7 @@ class DKB(DataClayObject):
                                         #              geohash, dequeues, obj.id_object, self.frame_number))
                                         objs.append((retrieval_id, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
                                                      geohash, dequeues, obj.id_object,
-                                                     event_snap.snap_alias.split("_")[1]))
+                                                     int(event_snap.snap_alias.split("_")[1]), obj.pixel_w, obj.pixel_h))
 
         return objs
 
@@ -111,9 +111,10 @@ class DKB(DataClayObject):
     def remove_events_snapshot(self, event_snp): 
         pass
 
-    @dclayMethod(object_id='str', object_class='str', return_='CityNS.classes.Object')
-    def get_or_create(self, object_id, object_class):
-        return self.list_objects.get_or_create(object_id, object_class)
+    @dclayMethod(object_id='str', object_class='str', x='int', y='int', w='int', h='int',
+                 return_='CityNS.classes.Object')
+    def get_or_create(self, object_id, object_class, x, y, w, h):
+        return self.list_objects.get_or_create(object_id, object_class, x, y, w, h)
 
 
 class ListOfObjects(DataClayObject):
@@ -131,11 +132,12 @@ class ListOfObjects(DataClayObject):
         self.federated_objects = []
         self.global_lock = threading.Lock()
 
-    @dclayMethod(object_id='str', object_class='str', return_='CityNS.classes.Object')
-    def get_or_create(self, object_id, object_class):
+    @dclayMethod(object_id='str', object_class='str', x='int', y='int', w='int', h='int',
+                 return_='CityNS.classes.Object')
+    def get_or_create(self, object_id, object_class, x, y, w, h):
         with self.global_lock:
             if object_id not in self.objects:
-                obj = Object(object_id, object_class)
+                obj = Object(object_id, object_class, x, y, w, h)
                 self.objects[object_id] = obj
             return self.objects[object_id]
 
@@ -160,6 +162,7 @@ class FederationInfo(DataClayObject):
 
     @dclayImport traceback
     @dclayImport uuid
+    @dlcayImportFrom dataclay import getRuntime
     """
 
     @dclayMethod(snapshots='list<CityNS.classes.EventsSnapshot>')
@@ -181,6 +184,7 @@ class FederationInfo(DataClayObject):
 
     @dclayMethod() 
     def when_federated(self):
+        from dataclay import getRuntime
         try:
             kb = DKB.get_by_alias("DKB")
             backend_id = kb.cloud_backend_id
@@ -195,14 +199,18 @@ class FederationInfo(DataClayObject):
                     obj_class = obj_dict["type"]
                     event_dict = obj_dict["event"]
                     geohash = obj_dict["geohash"]
+                    x = obj_dict["x"]
+                    y = obj_dict["y"]
+                    w = obj_dict["w"]
+                    h = obj_dict["h"]
 
-                    ## TODO: TO BE USED IN THE FUTURE ##
+                    ## TODO: TO BE USED IN THE FUTURE OR NOT NEEDED AS IT IS NOT INFO FEDERATED FROM EDGE ##
                     trajectory_px = obj_dict["trajectory_px"]
                     trajectory_py = obj_dict["trajectory_py"]
                     trajectory_pt = obj_dict["trajectory_pt"]
                     ## ##
                     
-                    obj = kb.get_or_create(obj_id, obj_class)
+                    obj = kb.get_or_create(obj_id, obj_class, x, y, w, h)
                     object_id = obj.get_object_id()
                     class_id = obj.get_class_extradata().class_id
                     snapshot_objects_refs.append(str(object_id) + ":" + str(class_id))
@@ -218,27 +226,29 @@ class FederationInfo(DataClayObject):
                 kb.add_events_snapshot(snapshot)
                 try:
                     # trigger prediction via REST with alias specified for last EventsSnapshot
-                    apihost = 'https://192.168.7.40:31001'
+                    apihost = 'https://192.168.7.42:31001'  # 'https://192.168.7.40:31001'
                     auth_key = \
                        '23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP'
                     namespace = '_'
-                    blocking = 'true'
-                    result = 'true'
-                    trigger = 'tp-trigger'
-                    url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
-                    # TP_ACTION = 'tpAction'
-                    # url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + TP_ACTION + \
-                    #      '?blocking=true&result=true'
+                    blocking = 'false'
+                    result = 'false'
+                    # trigger = 'tp-trigger'
+                    # url = apihost + '/api/v1/namespaces/' + namespace + '/triggers/' + trigger
+                    tp_action = 'tpAction'
+                    cd_action = 'cdAction'
+                    url = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + tp_action + \
+                          '?blocking=false&result=false'  # asynchronous invocation
+                    url_cd = apihost + '/api/v1/namespaces/' + namespace + '/actions/' + cd_action + \
+                             '?blocking=false&result=false'  # asynchronous invocation
                     user_pass = auth_key.split(':')
                     # alias = snap_alias
                     alias = "DKB"
-                    response = snapshot.session.post(url, params={'blocking': blocking, 'result': result},
+                    snapshot.session.post(url, params={'blocking': blocking, 'result': result},
                                                      json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]),
                                                      verify=False)  # keep alive the connection
-                    # print(f"RESPONSE TEXT: {response.text}")
-                    # for retr_id, traj_px, traj_py, traj_pt, geohash, obj_events_hist, obj_id, frame in kb.get_objects(
-                    #        with_tp=True, events_length_max=20, events_length_min=5):
-                    #    print(f"LOG FILE: {frame} {obj_events_hist[2][-1]} {obj_id} {traj_px} {traj_py} {traj_pt}")
+                    snapshot.session.post(url_cd, params={'blocking': blocking, 'result': result},
+                                          json={"ALIAS": str(alias)}, auth=(user_pass[0], user_pass[1]),
+                                          verify=False)  # keep alive the connection
                 except Exception:
                     traceback.print_exc()
                     print("Error in REST API connection with Modena.")
@@ -305,9 +315,12 @@ class EventsSnapshot(DataClayObject):
             yaw_pred = ev[4]
             lat = ev[5]
             lon = ev[6]
-            #object_alias = str(id_cam) + "_" + str(tracker_id)
-            object_alias = "20939_" + str(tracker_id) # TODO: hardcoded cam ID because deduplicator id is wrong
-            obj = kb.get_or_create(object_alias, classes[tracker_class])
+            x = ev[7]
+            y = ev[8]
+            w = ev[9]
+            h = ev[10]
+            object_alias = str(id_cam) + "_" + str(tracker_id)
+            obj = kb.get_or_create(object_alias, classes[tracker_class], x, y, w, h)
             event = Event(uuid.uuid4().int, obj, self.timestamp, vel_pred, yaw_pred, float(lon), float(lat))
             # object_id = obj.get_object_id()
             # class_id = obj.get_class_extradata().class_id
@@ -344,7 +357,8 @@ class EventsSnapshot(DataClayObject):
 
     @dclayMethod(return_='str')
     def __repr__(self):
-        return f"Events Snapshot: \n\tobjects: {self.objects}, \n\tobjects_refs: {self.objects_refs}, \n\tsnap_alias: {self.snap_alias}, timestamp: {self.timestamp}"
+        return f"Events Snapshot: \n\tobjects: {self.objects}, \n\tobjects_refs: {self.objects_refs}, \n\tsnap_alias: " \
+               f"{self.snap_alias}, timestamp: {self.timestamp}"
 
 
 """
@@ -363,10 +377,15 @@ class Object(DataClayObject):
     @ClassField geohash str
     @ClassField retrieval_id str
     @ClassField timestamp_last_tp_comp int
+    @ClassField frame_last_tp int
+    @ClassField pixel_x int
+    @ClassField pixel_y int
+    @ClassField pixel_w int
+    @ClassField pixel_h int
     """
     
-    @dclayMethod(id_object='str', obj_type='str')
-    def __init__(self, id_object, obj_type):
+    @dclayMethod(id_object='str', obj_type='str', x='int', y='int', w='int', h='int')
+    def __init__(self, id_object, obj_type, x, y, w, h):
         self.id_object = id_object
         self.type = obj_type
         self.events_history = dict()
@@ -374,15 +393,21 @@ class Object(DataClayObject):
         self.trajectory_py = []
         self.trajectory_pt = []
         self.geohash = ""
-        self.retrieval_id = "" # TODO: added for retrieval purposes for IBM
+        self.retrieval_id = ""  # added for retrieval purposes for IBM
         self.timestamp_last_tp_comp = -1
+        self.frame_last_tp = -1
+        self.pixel_x = x
+        self.pixel_y = y
+        self.pixel_w = w
+        self.pixel_h = h
 
     @dclayMethod(snap_timestamp='int', return_="dict<str, anything>")
     def convert_to_dict(self, snap_timestamp):
         event = self.events_history[snap_timestamp].convert_to_dict()
         return {"id_object": self.id_object, "type": self.type, "event": event, 
                 "trajectory_px": self.trajectory_px, "trajectory_py": self.trajectory_py, 
-                "trajectory_pt": self.trajectory_pt, "geohash": self.geohash}
+                "trajectory_pt": self.trajectory_pt, "geohash": self.geohash,
+                "x": self.pixel_x, "y": self.pixel_y, "w": self.pixel_w, "h": self.pixel_h}
 
     @dclayMethod(event='CityNS.classes.Event')
     def add_event(self, event):
@@ -390,13 +415,18 @@ class Object(DataClayObject):
         self.events_history[event.timestamp] = event
 
     # Updates the trajectory prediction
-    @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>', timestamp_last_tp_comp='int')
-    def add_prediction(self, tpx, tpy, tpt, timestamp_last_tp_comp):
+    @dclayMethod(tpx='list<float>', tpy='list<float>', tpt='list<anything>', timestamp_last_tp_comp='int',
+                 frame_tp='int')
+    def add_prediction(self, tpx, tpy, tpt, timestamp_last_tp_comp, frame_tp):
         import numpy
         self.trajectory_px = tpx
         self.trajectory_py = tpy
         self.trajectory_pt = tpt
         self.timestamp_last_tp_comp = timestamp_last_tp_comp
+        obj_hist_ts = next(reversed(sorted(self.events_history)))
+        self.frame_last_tp = frame_tp
+        print(f"TP LOG FILE: {frame_tp} {obj_hist_ts} {self.id_object} {self.trajectory_px} {self.trajectory_py} \
+                                                {self.trajectory_pt}")
     
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(events_length_max='int', return_="anything")
@@ -410,11 +440,6 @@ class Object(DataClayObject):
         for _, event in reversed(OrderedDict(sorted(self.events_history.items())).items()):
             if i == events_length_max:
                 break
-            """
-            dqx.append(event.latitude_pos)
-            dqy.append(event.longitude_pos)
-            dqt.append(event.timestamp)
-            """
             dqx.insert(0, event.latitude_pos)
             dqy.insert(0, event.longitude_pos)
             dqt.insert(0, event.timestamp)  # dequeues should be ordered with increasingly timestamps
