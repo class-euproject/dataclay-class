@@ -11,9 +11,11 @@ services:
       - "11034:11034"
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=192.168.50.103
+      #- LOGICMODULE_HOST=192.168.50.103
+      - LOGICMODULE_HOST=127.0.0.1
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
+      - EXPOSED_IP_FOR_CLIENT=127.0.0.1
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -32,8 +34,10 @@ services:
       - DATASERVICE_NAME=DS1
       - DATASERVICE_JAVA_PORT_TCP=2127
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=192.168.50.103
-      - DATASERVICE_HOST=192.168.50.103 
+      - LOGICMODULE_HOST=127.0.0.1
+        #- LOGICMODULE_HOST=192.168.50.103
+        # - DATASERVICE_HOST=192.168.50.103 
+      - DATASERVICE_HOST=127.0.0.1
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -53,9 +57,11 @@ services:
     environment:
       - DATASERVICE_NAME=DS1
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=192.168.50.103
+        # - LOGICMODULE_HOST=192.168.50.103
+      - LOGICMODULE_HOST=127.0.0.1
       - PYCLAY_LIBS=requests geolib pygeohash numpy
-      - DATASERVICE_HOST=192.168.50.103
+        # - DATASERVICE_HOST=192.168.50.103
+      - DATASERVICE_HOST=127.0.0.1
       - DATASERVICE_PYTHON_PORT_TCP=6867
     stop_grace_period: 5m
     healthcheck:
@@ -72,7 +78,8 @@ services:
       - dataclay-init:/srv/dataclay/shared
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=192.168.50.103
+        # - LOGICMODULE_HOST=192.168.50.103
+      - LOGICMODULE_HOST=127.0.0.1
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
