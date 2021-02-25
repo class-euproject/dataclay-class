@@ -64,11 +64,10 @@ class DKB(DataClayObject):
     #           trajectory prediction. If == None, then return all objects (with/without tp).
     # If connected == True, return connected car objects only. If == False then return all non-connected cars.
     # If == None, then return all objects (connected and non-connected).
-    # @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', return_="set<CityNS.classes.Object>") # return tuple instead of object
-    @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool', events_length_max='int',
-                 events_length_min='int', return_="list<anything>")
-    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None, events_length_max=20,
-                    events_length_min=5):
+    @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool',
+                 events_length_max='dict<str,int>', events_length_min='dict<str,int>', return_="list<anything>")
+    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None, events_length_max=[],
+                    events_length_min=[]):
         objs = []
         obj_refs = []
         # for i, (_, event_snap) in enumerate(reversed(OrderedDict(sorted(self.kb.items()))).items()): # get latest updates for objects
@@ -94,9 +93,10 @@ class DKB(DataClayObject):
                                 #     (OrderedDict(sorted(obj.events_history.items())).values())]))
                                 # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
                                 #     obj.get_events_history()))
-                                dequeues = obj.get_events_history(events_length_max)
+                                obj_type = obj.type
+                                dequeues = obj.get_events_history(events_length_max[obj_type])
                                 # dequeues[2] -> timestamp dequeue and [-1] to get last value
-                                if len(dequeues[0]) >= events_length_min:
+                                if len(dequeues[0]) >= events_length_min[obj_type]:
                                     if (with_tp is None or not with_tp) and dequeues[2][-1] > obj.timestamp_last_tp_comp\
                                             or with_tp:  # condition is only active for the TP invocation
                                         # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
