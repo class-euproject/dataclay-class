@@ -1,7 +1,7 @@
 # dataclay-class
 
 This repository contains the file containing the data model and the docker files
-to deploy dataClay with the model.
+to deploy dataClay with the debug synchronous model.
 
 # Python dependencies
 
