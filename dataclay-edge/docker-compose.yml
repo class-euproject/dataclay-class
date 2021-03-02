@@ -91,3 +91,47 @@ services:
       interval: 5s
       retries: 10
       test: [ "CMD-SHELL", "/dataclay-initializer/health_check.sh" ]
+
+  retrieve-objects:
+    image: retrieve-objects
+    network_mode: host
+    build: retrieve-objects
+    depends_on:
+      - dcinitializer
+    volumes:
+      - dataclay-init:/srv/dataclay/shared:ro
+    environment:
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=localhost
+      - USER=CityUser
+      - PASS=p4ssw0rd
+      - DATASET=City
+      - NAMESPACE=CityNS
+  object-tracking:
+    image: jesusperalesh/class-object-tracking
+    tty: true
+    network_mode: host
+    depends_on:
+      - retrieve-objects
+    volumes:
+      - dataclay-init:/srv/dataclay/shared:ro
+    environment:
+      - LOGICMODULE_PORT_TCP=11034
+      - LOGICMODULE_HOST=localhost
+      - USER=CityUser
+      - PASS=p4ssw0rd
+      - DATASET=City
+      - NAMESPACE=CityNS
+      - STUBSPATH=/root/COMPSs-obstacle-detection/stubs
+      - CONTRACT_ID_PATH=/srv/dataclay/shared/CityNS_contractid
+  object-detection:
+    image: jesusperalesh/class-object-detection
+    tty: true
+    network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
