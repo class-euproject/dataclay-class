@@ -15,7 +15,7 @@ services:
       - LOGICMODULE_HOST=127.0.0.1
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
-      - EXPOSED_IP_FOR_CLIENT=127.0.0.1
+      - EXPOSED_IP_FOR_CLIENT=172.17.0.1
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -92,7 +92,6 @@ services:
       retries: 10
       test: [ "CMD-SHELL", "/dataclay-initializer/health_check.sh" ]
 
-
   retrieve-objects:
     image: retrieve-objects
     network_mode: host
@@ -112,23 +111,25 @@ services:
   object-tracking:
     image: jesusperalesh/class-object-tracking
     tty: true
-    network_mode: host
+    network_mode: bridge
     depends_on:
       - retrieve-objects
     volumes:
       - dataclay-init:/srv/dataclay/shared:ro
+      - ./cfgfiles:/root/COMPSs-obstacle-detection/cfgfiles
+      - ./compss_config:/root/COMPSs-obstacle-detection/config
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=localhost
+      - LOGICMODULE_HOST=172.17.0.1
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
       - NAMESPACE=CityNS
       - STUBSPATH=/root/COMPSs-obstacle-detection/stubs
       - CONTRACT_ID_PATH=/srv/dataclay/shared/CityNS_contractid
-
+  
   object-detection:
     image: jesusperalesh/class-object-detection
     runtime: nvidia
     tty: true
-    network_mode: host
+    network_mode: bridge
