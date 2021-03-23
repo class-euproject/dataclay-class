@@ -15,7 +15,6 @@ class DKB(DataClayObject):
     @dclayImportFrom geolib import geohash
     @dclayImportFrom collections import OrderedDict
     """
-    # kb should be a dict<int, CityNS.classes.EventsSnapshot> so snapshots are ordered by timestamp
 
     @dclayMethod(k='int')
     def __init__(self, k=10):
@@ -50,7 +49,7 @@ class DKB(DataClayObject):
         objs = []
         obj_refs = []
         for event_snap in reversed(OrderedDict(sorted(self.kb.items())).values()): # get latest updates for objects
-            for obj_ref in event_snap.objects_refs: # TODO: update this with objects instead of objects_refs
+            for obj_ref in event_snap.objects_refs:  # TODO: update this with objects instead of objects_refs
                 if obj_ref not in obj_refs:
                     obj_refs.append(obj_ref)
                     obj = Object.get_by_alias(obj_ref)
@@ -65,18 +64,44 @@ class DKB(DataClayObject):
     # If connected == True, return connected car objects only. If == False then return all non-connected cars.
     # If == None, then return all objects (connected and non-connected).
     @dclayMethod(geohashes='set<str>', with_neighbors='bool', with_tp='bool', connected='bool',
-                 events_length_max='dict<str,int>', events_length_min='dict<str,int>', return_="list<anything>")
-    def get_objects(self, geohashes=[], with_neighbors=None, with_tp=None, connected=None, events_length_max=[],
-                    events_length_min=[]):
+                 events_length_max='dict<str,int>', events_length_min='dict<str,int>', num_objects='int',
+                 return_="list<anything>")
+    def get_objects(self, geohashes=None, with_neighbors=None, with_tp=None, connected=None, events_length_max=None,
+                    events_length_min=None, num_objects=None):
+        if events_length_max is None:
+            events_length_max = {
+                "person": 50,
+                "car": 40,
+                "truck": 40,
+                "bus": 40,
+                "motor": 40,
+                "bike": 40,
+                "rider": 50,
+                "train": 40
+            }
+        if events_length_min is None:
+            events_length_min = {
+                "person": 20,
+                "car": 10,
+                "truck": 10,
+                "bus": 10,
+                "motor": 10,
+                "bike": 10,
+                "rider": 20,
+                "train": 10
+            }
+        if geohashes is None:
+            geohashes = []
         objs = []
         obj_refs = []
         # for i, (_, event_snap) in enumerate(reversed(OrderedDict(sorted(self.kb.items()))).items()): # get latest updates for objects
         for i, event_snap in enumerate(reversed(OrderedDict(sorted(self.kb.items())).values())): # get latest updates for objects
-            if i > self.K:
+            if i > self.K or num_objects is not None and len(objs) == num_objects:
                 break
             for obj in event_snap.objects.values():
-                # id_object = obj.id_object # TODO: retrieval_id instead of id_object
-                retrieval_id = obj.retrieval_id # TODO: retrieval_id instead of id_object
+                if num_objects is not None and len(objs) == num_objects:
+                    break
+                retrieval_id = obj.retrieval_id
                 if retrieval_id not in obj_refs:
                     obj_refs.append(retrieval_id)
                     geohash = obj.geohash
@@ -91,16 +116,12 @@ class DKB(DataClayObject):
                                 # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
                                 #     [list(ev.convert_to_dict().values()) for ev in list
                                 #     (OrderedDict(sorted(obj.events_history.items())).values())]))
-                                # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
-                                #     obj.get_events_history()))
                                 obj_type = obj.type
                                 dequeues = obj.get_events_history(events_length_max[obj_type])
-                                # dequeues[2] -> timestamp dequeue and [-1] to get last value
+                                timestamp = dequeues[2][-1]  # timestamp dequeue and [-1] to get ts of last event
                                 if len(dequeues[0]) >= events_length_min[obj_type]:
-                                    if (with_tp is None or not with_tp) and dequeues[2][-1] > obj.timestamp_last_tp_comp\
+                                    if (with_tp is None or not with_tp) and timestamp > obj.timestamp_last_tp_comp\
                                             or with_tp:  # condition is only active for the TP invocation
-                                        # objs.append((id_object, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
-                                        #              geohash, dequeues, obj.id_object, self.frame_number))
                                         objs.append((retrieval_id, trajectory_px, obj.trajectory_py, obj.trajectory_pt,
                                                      geohash, dequeues, obj.id_object,
                                                      int(event_snap.snap_alias.split("_")[1]), obj.pixel_w, obj.pixel_h))
@@ -226,7 +247,7 @@ class FederationInfo(DataClayObject):
                                   event_dict["latitude_pos"])
                     obj.add_event(event)
                     snapshot.objects[obj.id_object] = obj
-                    ### DEBUG ###
+                    ### FOR LOGGING ###
                     id_cam = obj_id.split("_")[0]
                     iteration = snap_alias.split("_")[1]
                     ts = snapshot.timestamp
@@ -273,7 +294,7 @@ class FederationInfo(DataClayObject):
                                           verify=False)  # keep alive the connection
                 except Exception:
                     traceback.print_exc()
-                    print("Error in REST API connection with Modena.")
+                    print("Error in REST API connection in when_federated.")
 
         except Exception:
             traceback.print_exc()
@@ -344,9 +365,6 @@ class EventsSnapshot(DataClayObject):
             object_alias = str(id_cam) + "_" + str(tracker_id)
             obj = kb.get_or_create(object_alias, classes[tracker_class], x, y, w, h)
             event = Event(uuid.uuid4().int, obj, self.timestamp, vel_pred, yaw_pred, float(lon), float(lat))
-            # object_id = obj.get_object_id()
-            # class_id = obj.get_class_extradata().class_id
-            # self.add_object_refs(str(object_id) + ":" + str(class_id))
             obj.add_event(event)
             obj.geohash = pgh.encode(lat, lon, precision=7)
             if obj.id_object not in self.objects:
