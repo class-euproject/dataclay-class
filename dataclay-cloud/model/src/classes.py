@@ -125,15 +125,15 @@ class DKB(DataClayObject):
                                     if with_tp is None or not with_tp: #and
                                         if dequeues[2][-1] > obj.timestamp_last_tp_comp:
 	                                    #or with_tp:  # condition of > is only active for the TP invocation
-	                                    objs.append((retrieval_id, trajectory_px, obj.trajectory_py,
+                                            objs.append((retrieval_id, trajectory_px, obj.trajectory_py,
 	                                                 obj.trajectory_pt,
 	                                                 geohash, dequeues, obj.id_object,
 	                                                 int(event_snap.snap_alias.split("_")[1]), obj.pixel_w,
 	                                                 obj.pixel_h))
-	                                else:  # for CD
-	                                    objs.append((trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
+                                        else:  # for CD
+                                            objs.append((trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
 	                                                 obj.id_object, obj.type))
-	return objs
+        return objs
 
 
     @dclayMethod(eventSnp='CityNS.classes.EventsSnapshot')
@@ -358,12 +358,12 @@ class EventsSnapshot(DataClayObject):
         classes = ["person", "car", "truck", "bus", "motor", "bike", "rider", "traffic light", "traffic sign", "train"]
         # snapshot_ts = int(datetime.now().timestamp() * 1000) # replaced for below
         # self.timestamp = events_detected[0]
-	if self.snap_alias.split("_")[1] == "0":  # frame 0
-	    self.timestamp = events_detected[0]
-	    kb.ORIGINAL_TIMESTAMP = self.timestamp
-	else:
-	    self.timestamp = kb.ORIGINAL_TIMESTAMP + int(self.snap_alias.split("_")[1]) * 1000 // 24
-	# self.timestamp = 1611592497727 + int(self.snap_alias.split("_")[1])*400 # TODO: to debug purpose only
+        if self.snap_alias.split("_")[1] == "0":  # frame 0
+            self.timestamp = events_detected[0]
+            kb.ORIGINAL_TIMESTAMP = self.timestamp
+        else:
+            self.timestamp = kb.ORIGINAL_TIMESTAMP + int(self.snap_alias.split("_")[1]) * 1000 // 24
+        # self.timestamp = 1611592497727 + int(self.snap_alias.split("_")[1])*400 # TODO: to debug purpose only
         for index, ev in enumerate(events_detected[1]):
             id_cam = ev[0]
             tracker_id = ev[1]
