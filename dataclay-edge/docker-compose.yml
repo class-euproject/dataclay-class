@@ -5,10 +5,11 @@ volumes:
 services:
   logicmodule:
     image: "bscdataclay/logicmodule:alpine"
+    # image: "bscdataclay/logicmodule:develop-alpine"
     network_mode: host
     command: ""
-    ports:
-      - "11034:11034"
+    # ports:
+    #  - "11034:11034"
     environment:
       - LOGICMODULE_PORT_TCP=11034
       #- LOGICMODULE_HOST=192.168.50.103
@@ -24,10 +25,11 @@ services:
          
   dsjava:
     image: "bscdataclay/dsjava:alpine"
+    # image: "bscdataclay/dsjava:develop-alpine"
     network_mode: host
     command: "${COMMAND_OPTS}"
-    ports:
-      - "2127:2127"
+    # ports:
+    #   - "2127:2127"
     depends_on:
       - logicmodule
     environment:
@@ -47,10 +49,11 @@ services:
   dspython:
     # image: "bscdataclay/dspython:2.5.py36-alpine"
     image: "bscdataclay/dspython:2.5.py36-slim"
+    # image: "bscdataclay/dspython:develop.py36-slim"
     network_mode: host
     command: ""
-    ports:
-      - "6867:6867"
+    # ports:
+    #   - "6867:6867"
     depends_on:
       - logicmodule
       - dsjava
@@ -70,7 +73,8 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
 
   dcinitializer:
-    image: "bscdataclay/initializer"
+    # image: "bscdataclay/initializer"
+    image: "bscdataclay/initializer:develop-alpine"
     network_mode: host
     depends_on:
       - logicmodule
