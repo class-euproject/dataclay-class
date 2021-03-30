@@ -124,15 +124,15 @@ class DKB(DataClayObject):
                                 if len(dequeues[0]) >= events_length_min[obj_type]:
                                     if with_tp is None or not with_tp: #and
                                         if dequeues[2][-1] > obj.timestamp_last_tp_comp:
-	                                    #or with_tp:  # condition of > is only active for the TP invocation
+                                            #or with_tp:  # condition of > is only active for the TP invocation
                                             objs.append((retrieval_id, trajectory_px, obj.trajectory_py,
-	                                                 obj.trajectory_pt,
-	                                                 geohash, dequeues, obj.id_object,
-	                                                 int(event_snap.snap_alias.split("_")[1]), obj.pixel_w,
-	                                                 obj.pixel_h))
-                                        else:  # for CD
-                                            objs.append((trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
-	                                                 obj.id_object, obj.type))
+                                                obj.trajectory_pt,
+                                                geohash, dequeues, obj.id_object,
+                                                int(event_snap.snap_alias.split("_")[1]), obj.pixel_w,
+                                                obj.pixel_h))
+                                    else:  # for CD
+                                        objs.append((trajectory_px, obj.trajectory_py, obj.trajectory_pt, geohash,
+                                            obj.id_object, obj.type))
         return objs
 
 
