@@ -265,13 +265,13 @@ class FederationInfo(DataClayObject):
                     yaw = event_dict["yaw"]
                     if obj.frame_last_tp != -1:
                         print(
-                            f"WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
-                            {obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {next(reversed(sorted(obj.events_history)))} \
-                            {obj.trajectory_px} {obj.trajectory_py} {obj.trajectory_pt}")
+                            f'''WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
+{obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {next(reversed(sorted(obj.events_history)))} \
+{obj.trajectory_px} {obj.trajectory_py} {obj.trajectory_pt}''')
                     else:
                         print(
-                            f"WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
-                            {obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {-1} 0,0,0,0,0 0,0,0,0,0 0,0,0,0,0")
+                            f'''WF LOG FILE: {id_cam} {iteration} {ts} {obj_class} {lat} {lon} {geohash} {speed} {yaw} \
+{obj_id} {x} {y} {w} {h} {obj.frame_last_tp} {-1} 0,0,0,0,0 0,0,0,0,0 0,0,0,0,0''')
 
                 snapshot.objects_refs = snapshot_objects_refs
                 kb.add_events_snapshot(snapshot)
@@ -479,8 +479,8 @@ class Object(DataClayObject):
         self.timestamp_last_tp_comp = timestamp_last_tp_comp
         obj_hist_ts = next(reversed(sorted(self.events_history)))
         self.frame_last_tp = frame_tp
-        print(f"TP LOG FILE: {frame_tp} {obj_hist_ts} {self.id_object} {self.trajectory_px} {self.trajectory_py} \
-                                                {self.trajectory_pt}")
+        print(f'''TP LOG FILE: {frame_tp} {obj_hist_ts} {self.id_object} {self.trajectory_px} {self.trajectory_py} \
+{self.trajectory_pt}''')
     
     # Returns the Object and its Events history (Deque format)
     @dclayMethod(events_length_max='int', return_="anything")
