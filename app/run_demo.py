@@ -30,24 +30,19 @@ def createDCObjects(KB):
 
             eventObject = KB.get_or_create(row["id_obj"], obj_type, row['x'], row['y'], row['w'], row['h'])
             eventObject.make_persistent()
-
             obj_id = str(eventObject.get_object_id()) + ":" + str(eventObject.get_class_extradata().class_id)
-            if obj_id not in eventsSnapshot.objects_refs:
-                eventsSnapshot.add_object_refs(obj_id)
-                eventsSnapshot.add_object(eventObject)
-                eventObject.retrieval_id = obj_id # TODO: add this in model and update get_objects() in DKB to return this instead of id_object
+            eventObject.retrieval_id = obj_id  # TODO: add this in model and update get_objects() in DKB to return this instead of id_object
 
             event = Event(uuid.uuid4().int, eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), float(row["lon"]), float(row["lat"]))
             eventObject.geohash = row["geohash"][0:7]
             eventsSnapshot.timestamp = row["timestamp"]
-
+            eventsSnapshot.add_event(event)
             eventObject.add_event(event)
 #        import pdb;pdb.set_trace()
         eventsSnapshot.make_persistent("events_" + str(name))
         KB.add_events_snapshot(eventsSnapshot)
 
 if __name__ == "__main__":
-    backend_id = get_backend_id_by_name("DS1")
     try:
 #        import pdb;pdb.set_trace()
         KB = DKB.get_by_alias("DKB")
@@ -55,10 +50,6 @@ if __name__ == "__main__":
     except Exception:
         KB = DKB()
 #        KBob.cloud_backend_id = backend_id
-        list_objects = ListOfObjects()
-        list_objects.make_persistent()
-        kb.list_objects = list_objects
-
         KB.make_persistent(alias="DKB")
 #    import pdb;pdb.set_trace()
     createDCObjects(KB)
