@@ -2,6 +2,8 @@
 
 echo "Killing and removing dockers"
 docker-compose kill && docker-compose down -v 
+rm -rf /tmp/dataClay-cloud/storage/*
+mkdir -p /tmp/dataClay-cloud/storage
 
 echo "Launching dockers"
 docker-compose up -d

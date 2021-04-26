@@ -1,5 +1,4 @@
 from dataclay.api import init, finish
-from storage.api import getByID
 from dataclay import getRuntime 
 from dataclay.api import get_backend_id_by_name
 import time
@@ -8,36 +7,38 @@ import uuid
 # Init dataClay session
 init()
 
-from CityNS.classes import DKB, Object, EventsSnapshot, ListOfObjects
+from CityNS.classes import DKB, Object, EventsSnapshot
 
 def main():
-    backend_id = get_backend_id_by_name("DS1")
     try:
         KBob = DKB.get_by_alias("DKB")
     except Exception:
         KBob = DKB()
-        KBob.cloud_backend_id = backend_id
-        list_objects = ListOfObjects()
-        list_objects.make_persistent()
-        KBob.list_objects = list_objects
         KBob.make_persistent(alias="DKB")
 
-    snaps = []
     while True:
         print("Checking Events Snapshot received...")
         kb = KBob.kb
-        for timestamp, eventSnap in list(kb.items()):
-            if eventSnap.snap_alias not in snaps:
-                print("Snapshot " + eventSnap.snap_alias + " received.")
-                snaps.append(eventSnap.snap_alias)
-                for objInSnapshot in eventSnap.objects_refs:
-                    obj_id, class_id = objInSnapshot.split(":")
-                    obj_id = uuid.UUID(obj_id)
-                    class_id = uuid.UUID(class_id)
-                    obj = getRuntime().get_object_by_id(obj_id, hint=backend_id, class_id=class_id)
-                    print(obj)
-                print("#################")
+        last_timestamp = 0
+        if len(kb) > 0:
+            last_timestamp = next(reversed(sorted(list(kb.keys()))))
+        print(f"Number of snapshots {len(list(kb.keys()))} and number of objects {len(list(KBob.objects.keys()))} and last timestamp "
+              f"{last_timestamp}")
+        """
+        for timestamp in list(kb.keys()):
+            ts = timestamp
+            eventSnap = kb[timestamp]
+            current_snap_alias = eventSnap.snap_alias
+            print("Snapshot " + current_snap_alias + " found.")
+            for event in eventSnap.events:
+                obj = event.detected_object
+                print(obj)
+            print("#################")
+        """
         time.sleep(5)
+        if len(kb) > 0:
+            KBob.remove_old_snapshots_and_objects(last_timestamp, False)
+
 
 if __name__ == "__main__":
     main()

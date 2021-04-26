@@ -2,6 +2,8 @@
 
 echo "Removing old dockers"
 docker-compose kill && docker-compose down -v
+rm -rf /tmp/dataClay-cloud/storage/*
+mkdir -p /tmp/dataClay-cloud/storage
 
 echo "Launching dockers again"
 docker-compose up --build -d # launches also the docker that contains the 

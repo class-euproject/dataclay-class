@@ -1,4 +1,4 @@
-FROM bscdataclay/client:alpine
+FROM bscdataclay/client:dev20210422-alpine
 ENV WORKING_DIR=/demo
 ARG DC_SHARED_VOLUME=/srv/dataclay/shared
 ARG DEFAULT_NAMESPACE=defaultNS

@@ -4,9 +4,13 @@ volumes:
     driver: local
 services:
   logicmodule:
-    image: "bscdataclay/logicmodule:alpine"
+    image: "bscdataclay/logicmodule:dev20210422-alpine"
     network_mode: host
     command: ""
+    volumes:
+      - type: bind
+        source: /tmp/dataClay-edge/storage
+        target: /dataclay/storage
     ports:
       - "11034:11034"
     environment:
@@ -16,6 +20,12 @@ services:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
       - EXPOSED_IP_FOR_CLIENT=192.168.12.4
+    deploy:
+     resources:
+       limits:
+         memory: 1024M
+       reservations:
+         memory: 250M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -23,9 +33,13 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
          
   dsjava:
-    image: "bscdataclay/dsjava:alpine"
+    image: "bscdataclay/dsjava:dev20210422-alpine"
     network_mode: host
-    command: "${COMMAND_OPTS}"
+    command: ""
+    volumes:
+      - type: bind
+        source: /tmp/dataClay-edge/storage
+        target: /dataclay/storage
     ports:
       - "2127:2127"
     depends_on:
@@ -38,6 +52,22 @@ services:
         #- LOGICMODULE_HOST=192.168.50.103
         # - DATASERVICE_HOST=192.168.50.103 
       - DATASERVICE_HOST=127.0.0.1
+      - GLOBALGC_COLLECTOR_INITIAL_DELAY_HOURS=0
+      - GLOBALGC_MAX_TIME_QUARANTINE=200
+      # GLOBALGC_COLLECT_TIME_INTERVAL -> # of ms when unreferenced objects are deleted from db	      
+      - GLOBALGC_COLLECT_TIME_INTERVAL=60000
+      - GLOBALGC_CHECK_REMOTE_PENDING=4000
+      - GLOBALGC_PROCESS_COUNTINGS_INTERVAL=2000
+      - GLOBALGC_MAX_OBJECTS_TO_COLLECT_ITERATION=1000
+      - MEMMGMT_CHECK_TIME_INTERVAL=30000
+      - MEMMGMT_PRESSURE_FRACTION=0.75
+      - MEMMGMT_MIN_OBJECT_TIME=200
+    deploy:
+     resources:
+       limits:
+         memory: 1024M
+       reservations:
+         memory: 250M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -45,10 +75,13 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
        
   dspython:
-    # image: "bscdataclay/dspython:2.5.py36-alpine"
-    image: "bscdataclay/dspython:2.5.py36-slim"
+    image: "bscdataclay/dspython:dev20210422.py36-slim"
     network_mode: host
     command: ""
+    volumes:
+      - type: bind
+        source: /tmp/dataClay-edge/storage
+        target: /dataclay/storage
     ports:
       - "6867:6867"
     depends_on:
@@ -63,6 +96,17 @@ services:
         # - DATASERVICE_HOST=192.168.50.103
       - DATASERVICE_HOST=127.0.0.1
       - DATASERVICE_PYTHON_PORT_TCP=6867
+      - MEMMGMT_CHECK_TIME_INTERVAL=30000
+      - MEMMGMT_PRESSURE_FRACTION=0.75
+      - MEMMGMT_MIN_OBJECT_TIME=200
+      - MEMMGMT_EASE_FRACTION=0.1
+      #- LOGLEVEL=TRACE
+    deploy:
+     resources:
+       limits:
+         memory: 2048M
+       reservations:
+         memory: 100M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -70,10 +114,11 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
 
   dcinitializer:
-    image: "bscdataclay/initializer"
+    image: "bscdataclay/initializer:dev20210422-alpine"
     network_mode: host
     depends_on:
       - logicmodule
+    command: "--wait-for-python-ds 1 --wait-for-java-ds 1"
     volumes:
       - dataclay-init:/srv/dataclay/shared
     environment:
