@@ -36,8 +36,8 @@ def main():
             print("#################")
         """
         time.sleep(5)
-        if len(kb) > 0:
-            KBob.remove_old_snapshots_and_objects(last_timestamp, False)
+        # if len(kb) > 0:
+        #    KBob.remove_old_snapshots_and_objects(last_timestamp, False)
 
 
 if __name__ == "__main__":
