@@ -9,7 +9,7 @@ services:
     volumes:
       - type: bind
         source: /tmp/dataClay-edge/storage
-	target: /dataclay/storage
+        target: /dataclay/storage
     ports:
       - "11034:11034"
     environment:
