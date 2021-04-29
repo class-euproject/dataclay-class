@@ -598,20 +598,20 @@ class FederationCompressedInfo(DataClayObject):
                 yaw = compressed_event["yaw"]
                 if detected_object.frame_last_tp != -1:
                     print(
-                        f'''WF LOG FILE: {id_cam} {iteration} {ts} {detected_object.type} {lat} {lon} \
-                        {detected_object.geohash} {speed} {yaw} {detected_object_id} {detected_object.pixel_x} \
-                        {detected_object.pixel_y} {detected_object.pixel_w} {detected_object.pixel_h} {detected_object.frame_last_tp} \
-                        {next(reversed(sorted(detected_object.events_history)))} {detected_object.trajectory_px} \
-                        {detected_object.trajectory_py} {detected_object.trajectory_pt}''')
+                        f"""WF LOG FILE: {id_cam} {iteration} {ts} {detected_object.type} {lat} {lon} """
+                        f"""{detected_object.geohash} {speed} {yaw} {detected_object_id} {detected_object.pixel_x} """
+                        f"""{detected_object.pixel_y} {detected_object.pixel_w} {detected_object.pixel_h} """
+                        f"""{detected_object.frame_last_tp} {next(reversed(sorted(detected_object.events_history)))} """
+                        f"""{detected_object.trajectory_px} {detected_object.trajectory_py} """
+                        f"""{detected_object.trajectory_pt}""")
                 else:
                     print(
-                        f'''WF LOG FILE: {id_cam} {iteration} {ts} {detected_object.type} {lat} {lon} \
-                        {detected_object.geohash} {speed} {yaw} {detected_object_id} {detected_object.pixel_x} \
-                        {detected_object.pixel_y} {detected_object.pixel_w} {detected_object.pixel_h} {detected_object.frame_last_tp} \
-                        {-1} 0,0,0,0,0 0,0,0,0,0 0,0,0,0,0''')
+                        f"""WF LOG FILE: {id_cam} {iteration} {ts} {detected_object.type} {lat} {lon} """
+                        f"""{detected_object.geohash} {speed} {yaw} {detected_object_id} {detected_object.pixel_x} """
+                        f"""{detected_object.pixel_y} {detected_object.pixel_w} {detected_object.pixel_h} """
+                        f"""{detected_object.frame_last_tp} {-1} 0,0,0,0,0 0,0,0,0,0 0,0,0,0,0""")
 
                 kb.add_events_snapshot(snapshot)
-                """
                 try:
                     # trigger prediction via REST with alias specified for last EventsSnapshot
                     apihost = 'https://192.168.7.42:31001'  # 'https://192.168.7.40:31001'
@@ -640,6 +640,5 @@ class FederationCompressedInfo(DataClayObject):
                 except Exception:
                     traceback.print_exc()
                     print("Error in REST API connection in when_federated.")
-                """
         except Exception:
             traceback.print_exc()
