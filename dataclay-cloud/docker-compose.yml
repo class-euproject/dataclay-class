@@ -106,14 +106,15 @@ services:
     command: "--wait-for-python-ds 1 --wait-for-java-ds 1"
     volumes:
       - dataclay-init:/srv/dataclay/shared
-      - ./model/:/model/:ro
+      # - ./model/:/model/:ro
     environment:
       - LOGICMODULE_PORT_TCP=11034
       - LOGICMODULE_HOST=logicmodule
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
-      - PYTHON_MODELS_PATH=/model/src
+      # - PYTHON_MODELS_PATH=/model/src
+      - GIT_PYTHON_MODELS_URLS=https://gitlab.bsc.es/ppc-bsc/software/dataclay-object-detection-model.git
       - PYTHON_NAMESPACES=CityNS
     healthcheck:
       interval: 5s
@@ -122,6 +123,7 @@ services:
 
   retrieve-objects:
     image: retrieve-objects
+    network_mode: host
     build: retrieve-objects
     depends_on:
       - dcinitializer
@@ -129,7 +131,7 @@ services:
       - dataclay-init:/srv/dataclay/shared:ro
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=logicmodule
+      - LOGICMODULE_HOST=localhost
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
