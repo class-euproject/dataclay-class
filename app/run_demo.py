@@ -28,12 +28,15 @@ def createDCObjects(KB):
 #                obj_type = str(row["id_class"])
             obj_type = row["id_class"]
 
-            eventObject = KB.get_or_create(row["id_obj"], obj_type, row['x'], row['y'], row['w'], row['h'])
+            eventObject = KB.get_or_create(row["id_obj"], obj_type)
+            eventObject.set_pixels(row['x'], row['y'], row['w'], row['h'])
             eventObject.make_persistent()
             obj_id = str(eventObject.get_object_id()) + ":" + str(eventObject.get_class_extradata().class_id)
             eventObject.retrieval_id = obj_id  # TODO: add this in model and update get_objects() in DKB to return this instead of id_object
 
-            event = Event(uuid.uuid4().int, eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), float(row["lon"]), float(row["lat"]))
+            event = Event()
+            event.initialize(eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), float(row["lon"]),
+                             float(row["lat"]))
             eventObject.geohash = row["geohash"][0:7]
             eventsSnapshot.timestamp = row["timestamp"]
             eventsSnapshot.add_event(event)

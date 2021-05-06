@@ -104,7 +104,7 @@ class DKB(DataClayObject):
         # for i, (_, event_snap) in enumerate(reversed(OrderedDict(sorted(self.kb.items()))).items()): # get latest updates for objects
         for i, event_snap in enumerate(
                 reversed(OrderedDict(sorted(self.kb.items())).values())):  # get latest updates for objects
-            if i > self.K or num_objects is not None and len(objs) == num_objects:
+            if i >= self.K or num_objects is not None and len(objs) == num_objects:
                 break
             for event in event_snap.events:
                 if num_objects is not None and len(objs) == num_objects:
