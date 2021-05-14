@@ -4,10 +4,11 @@ services:
     image: jesusperalesh/class-object-detection
     runtime: nvidia
     ports:
-      - "${TKDNN_PORT}:${TKDNN_PORT}"
+      - "${TKDNN_PORT}:${TKDNN_PORT}/tcp"
+      - "${TKDNN_PORT}:${TKDNN_PORT}/udp"
     tty: true
     network_mode: bridge
     environment:
       - TKDNN_PORT=${TKDNN_PORT}
       - CAM_ID=${CAM_ID}
-    command: bash -c "cd class-edge/ && git pull && git submodule update --init --recursive && cd build/tkDNN/ && ./test_yolo3_berkeley && ./demo 1 ${CAM_ID} ${TKDNN_PORT} 0 1 <<< 'class' && exec bash"
+    command: bash -c "cd class-edge/ && git pull && git checkout udpsockets && git submodule update --init --recursive && cd build && make -j8 && cd tkDNN/ && ./demo 1 ${CAM_ID} ${TKDNN_PORT} 10000 0 1 <<< 'class' && exec bash"
