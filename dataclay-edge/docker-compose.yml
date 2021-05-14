@@ -154,7 +154,8 @@ services:
       - NAMESPACE=CityNS
 
   object-tracking:
-    image: jesusperalesh/class-object-tracking
+    # image: jesusperalesh/class-object-tracking
+    image: jesusperalesh/tracking_partial
     tty: true
     network_mode: bridge
     ports:
