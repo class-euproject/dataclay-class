@@ -4,7 +4,7 @@ volumes:
     driver: local
 services:
   logicmodule:
-    image: "bscdataclay/logicmodule:dev20210428-alpine"
+    image: "bscdataclay/logicmodule:dev20210603-alpine"
     command: ""
     volumes:
       - type: bind
@@ -32,7 +32,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
          
   dsjava:
-    image: "bscdataclay/dsjava:dev20210428-alpine"
+    image: "bscdataclay/dsjava:dev20210603-alpine"
     command: ""
     volumes:
       - type: bind
@@ -73,7 +73,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
        
   dspython:
-    image: "bscdataclay/dspython:dev20210428.py36-slim"
+    image: "bscdataclay/dspython:dev20210603.py36-slim"
     command: ""
     volumes:
       - type: bind
@@ -111,7 +111,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
 
   dcinitializer:
-    image: "bscdataclay/initializer:dev20210428-alpine"
+    image: "bscdataclay/initializer:dev20210603-alpine"
     depends_on:
       - logicmodule
     command: "--wait-for-python-ds 1 --wait-for-java-ds 1"
