@@ -4,7 +4,7 @@ volumes:
     driver: local
 services:
   logicmodule:
-    image: "bscdataclay/logicmodule:dev20210428-alpine"
+    image: "bscdataclay/logicmodule:dev20210603-alpine"
     network_mode: host
     command: ""
     volumes:
@@ -20,12 +20,8 @@ services:
       - DATACLAY_ADMIN_USER=admin
       - DATACLAY_ADMIN_PASSWORD=admin
       - EXPOSED_IP_FOR_CLIENT=192.168.12.4
-    deploy:
-     resources:
-       limits:
-         memory: 1024M
-       reservations:
-         memory: 250M
+    mem_limit: 1024M
+    mem_reservation: 250M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -33,7 +29,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
          
   dsjava:
-    image: "bscdataclay/dsjava:dev20210428-alpine"
+    image: "bscdataclay/dsjava:dev20210603-alpine"
     network_mode: host
     command: ""
     volumes:
@@ -62,12 +58,9 @@ services:
       - MEMMGMT_CHECK_TIME_INTERVAL=30000
       - MEMMGMT_PRESSURE_FRACTION=0.75
       - MEMMGMT_MIN_OBJECT_TIME=200
-    deploy:
-     resources:
-       limits:
-         memory: 1024M
-       reservations:
-         memory: 250M
+      - USE_DOCKER_NETWORK_FOR_BACKENDS=True
+    mem_limit: 1024M
+    mem_reservation: 250M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -75,7 +68,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
        
   dspython:
-    image: "bscdataclay/dspython:dev20210428.py36-slim"
+    image: "bscdataclay/dspython:dev20210603.py36-slim"
     network_mode: host
     command: ""
     volumes:
@@ -100,13 +93,10 @@ services:
       - MEMMGMT_PRESSURE_FRACTION=0.75
       - MEMMGMT_MIN_OBJECT_TIME=200
       - MEMMGMT_EASE_FRACTION=0.1
-      #- LOGLEVEL=TRACE
-    deploy:
-     resources:
-       limits:
-         memory: 2048M
-       reservations:
-         memory: 100M
+      - USE_DOCKER_NETWORK_FOR_BACKENDS=True
+      # - LOGLEVEL=TRACE
+    mem_limit: 2048M
+    mem_reservation: 100M
     stop_grace_period: 5m
     healthcheck:
        interval: 5s
@@ -114,7 +104,7 @@ services:
        test: ["CMD-SHELL", "/home/dataclayusr/dataclay/health/health_check.sh"]
 
   dcinitializer:
-    image: "bscdataclay/initializer:dev20210428-alpine"
+    image: "bscdataclay/initializer:dev20210603-alpine"
     network_mode: host
     depends_on:
       - logicmodule
@@ -147,7 +137,7 @@ services:
       - dataclay-init:/srv/dataclay/shared:ro
     environment:
       - LOGICMODULE_PORT_TCP=11034
-      - LOGICMODULE_HOST=localhost
+      - LOGICMODULE_HOST=127.0.0.1
       - USER=CityUser
       - PASS=p4ssw0rd
       - DATASET=City
@@ -162,6 +152,7 @@ services:
       - "43001:43001"
     depends_on:
       - retrieve-objects
+      - dcinitializer
     volumes:
       - dataclay-init:/srv/dataclay/shared:ro
     environment:
