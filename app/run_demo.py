@@ -35,8 +35,7 @@ def createDCObjects(KB):
 
             event = Event()
             event.initialize(eventObject, row["timestamp"], float(row["speed"]), float(row["yaw"]), float(row["lon"]),
-                             float(row["lat"]), row['x'], row['y'], row['w'], row['h'])
-            eventObject.geohash = row["geohash"][0:7]
+                             float(row["lat"]), row['x'], row['y'], row['w'], row['h'], row["geohash"][0:7])
             eventsSnapshot.timestamp = row["timestamp"]
             eventsSnapshot.add_event(event)
             eventObject.add_event(event)
