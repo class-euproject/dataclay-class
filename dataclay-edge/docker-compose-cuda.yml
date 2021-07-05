@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   object-detection:
-    image: jesusperalesh/class-object-detection
+    image: bscppc/class-object-detection
     runtime: nvidia
     ports:
       - "${TKDNN_PORT}:${TKDNN_PORT}/tcp"
@@ -11,4 +11,4 @@ services:
     environment:
       - TKDNN_PORT=${TKDNN_PORT}
       - CAM_ID=${CAM_ID}
-    command: bash -c "cd class-edge/ && git pull && git checkout udpsockets && git submodule update --init --recursive && cd build && make -j8 && cd tkDNN/ && ./demo 1 ${CAM_ID} ${TKDNN_PORT} 10000 0 1 <<< 'class' && exec bash"
+    command: bash -c "cd class-edge/ && cd build && make -j8 && cd tkDNN/ && ./demo 1 ${CAM_ID} ${TKDNN_PORT} 2500 0 1 <<< 'class' & exec bash"
