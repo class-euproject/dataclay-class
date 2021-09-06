@@ -8,7 +8,14 @@ to deploy dataClay with the model.
 The Python used is `3.6.9`. The following python packages must be installed as well:
 
 ```
-python3 -m pip install geolib dataclay
+python3 -m pip install geolib dataclay requests pygeohash
+```
+
+# Install docker-compose
+```
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
 ```
 
 # Build
